@@ -1,0 +1,12 @@
+ajout fichier au prochain commit
+git add <nom fichier> ou git add . (tous les fichiers)
+
+pour commit
+git commit -m "message commit"
+git push
+
+pour aller chercher
+git fetch
+git pull
+
+ 
