@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <script type="text/javascript" src="js/indexedDB.js"></script>
+  <head>
+    <style>
+.buttonSync {
+    background-color: #000000;
+    border: white;
+    color: white;
+    padding: 20px 36px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 12px;
+    font-size: 20px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+.buttonDel {
+    background-color: #A9A9A9;
+    border: green;
+    color: white;
+    padding: 10px 18px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    border-radius: 12px;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+</style>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="lib/jquery.min.js"></script>
+    <title>Synchro</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <script src="lib/bootstrap.min.js"></script>
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <h1 class="page-header" align="center">Synchronisation</h1>
+  <h2 class="sub-header"></h2>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <td align="center">
+           <button onclick="Synchronisation()" class="buttonSync" width="100px">Synchronisation</button>
+         </td>
+      </tr>
+      <tr>
+        <td align="center">
+           <button onclick="fnDelete()" class="buttonDel" width="100px">Delete database</button>
+         </td>
+      </tr>
+
+
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="js/main.js"></script>
+</html>
