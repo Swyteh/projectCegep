@@ -1,23 +1,28 @@
 function read() {
-  $('#tblsearchitems tbody').empty();
-  var x = document.getElementById("fitem").value;
-  var db = request.result
-  .transaction("items", "readwrite")
-  .objectStore("items")
-  .index("by_descr");
-  var getItem = db.get(x);
-  var getKey = db.getKey(x);
+  var request = window.indexedDB.open("prextraDB",2);
+  request.onsuccess = function(event) {
+    db = request.result
+    $('#tblsearchitems tbody').empty();
+    var x = document.getElementById("fitem").value;
+    var db = request.result
+    .transaction("items", "readwrite")
+    .objectStore("items")
+    .index("by_descr");
+    var getItem = db.get(x);
+    var getKey = db.getKey(x);
 
-  getItem.onsuccess = function() {
-    getKey.onsuccess = function() {
-      if (getItem.result) {
-        $('#tblsearchitems tbody').append('<tr id="'+getKey.result+'""><td align="center">'+getItem.result.itemcode+'</td><td align="center">'+getItem.result.descr+'</td><td align="center"></td><td align="center">'+getItem.result.isactive+'</td><td align="center"><button onclick="remove('+getKey.result+')">Delete item</button></td></tr>');
-      }
-      else {
-        alert("Item introuvable");
-      }
+    getItem.onsuccess = function() {
+      getKey.onsuccess = function() {
+        if (getItem.result) {
+          $('#tblsearchitems tbody').append('<tr id="'+getKey.result+'""><td align="center">'+getItem.result.itemcode+'</td><td align="center">'+getItem.result.descr+'</td><td align="center"></td><td align="center">'+getItem.result.isActive+'</td><td align="center"><button onclick="remove('+getKey.result+')">Delete item</button></td></tr>');
+        }
+        else {
+          alert("Item introuvable");
+        }
+      };
     };
   };
+
 }
 
 function readAll() {
@@ -30,19 +35,20 @@ function readAll() {
      var cursor = event.target.result;
 
      if (cursor) {
-       $('#tblsearchitems tbody').append('<tr id="'+cursor.key+'""><td align="center">'+cursor.value.itemcode+'</td><td align="center">'+cursor.value.descr+'</td><td align="center"></td><td align="center">'+cursor.value.isactive+'</td><td align="center"><button onclick="remove('+cursor.key+')">Delete item</button></td></tr>');
+       $('#tblsearchitems tbody').append('<tr id="'+cursor.key+'""><td align="center">'+cursor.value.itemcode+'</td><td align="center">'+cursor.value.descr+'</td><td align="center"></td><td align="center">'+cursor.value.isActive+'</td><td align="center"><button onclick="remove('+cursor.key+')">Delete item</button></td></tr>');
        cursor.continue();
      }
   };
 }
 
 function add() {
+  request = window.indexedDB.open("prextraDB",4);
   var code = document.getElementById("fitemcode").value;
   var descr = document.getElementById("fitemdescr").value;
   var actif = document.getElementById("fitemactif").value;
   var request = db.transaction(["items"], "readwrite")
   .objectStore("items")
-  .add({ itemcode: code, descr: descr, isactive: actif});
+  .add({ itemcode: code, descr: descr, isActive: parseInt(actif)});
 
   request.onsuccess = function(event) {
      alert(code + " has been added to your database.");

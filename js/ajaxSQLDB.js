@@ -10,7 +10,7 @@ function ajaxItemsData(resolve,reject) {
       success: function(data){
         if(data)
         {
-
+        //  console.log(data);
           resolve(JSON.parse(data));
         }
       },
