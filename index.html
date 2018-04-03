@@ -4,22 +4,16 @@
 
 
   <head>
-
     <script type="text/javascript" src="lib/jquery.min.js"></script>
     <script src="lib/bootstrap.min.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/main.js?v=1"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Dashboard Template for Bootstrap</title>
-
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
-
-
     <link href="css/style.css" rel="stylesheet">
-
-
   </head>
 
   <body>
@@ -59,11 +53,10 @@
             <li><a href="#" id="sitestab" >Sites</a></li>
             <li><a href="#" id="serialtab" >Item serial</a></li>
             <li><a href="#" id="synchrotab" >Synchronisation</a></li>
-
           </ul>
         </div>
         <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
-          <iframe width="100%" height="700px" id="frametab"></iframe>
+          <iframe width="100%" height="700px" id="frametab" name="frametab" onload="iframeOnload(this,loadAdd);"></iframe>
         </div>
       </div>
     </div>

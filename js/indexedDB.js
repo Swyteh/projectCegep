@@ -17,8 +17,6 @@ var tbl_itemserial;
 var tbl_itemsite;
 var tbl_uom;
 
-
-
 function Synchronisation(){
   var promiseItems =  new Promise((resolve,reject) => {
   ajaxItemsData(resolve,reject);
@@ -46,8 +44,11 @@ function Synchronisation(){
   var promiseUom =  new Promise((resolve,reject) => {
   ajaxUomData(resolve,reject);
   })
-  
-  Promise.all([promiseItems,promiseLocations,promiseSites,promiseCompanies,promiseItemserial,promiseItemsite,promiseUom]).then(function(values){
+
+  Promise.all([promiseItems,promiseLocations,
+    promiseSites,promiseCompanies,promiseItemserial,
+    promiseItemsite,promiseUom]).then(function(values){
+
     var request = window.indexedDB.open("prextraDB", 1);
     request.onerror = function(event) {
       console.log("error: ");
