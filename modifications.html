@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <script src="lib/jquery.min.js"></script>
+    <script src="jqueryCookie/jquery_cookie.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="js/modifications.js"></script>
+    <script type="text/javascript" src="js/ajaxSQLDB.js"></script>
+    <script type="text/javascript" src="js/indexedDB.js"></script>
+    <title>Modifications</title>
+    <!-- Bootstrap core CSS -->
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+  </head>
+  <body  onload="showModifs();">
+  <div align="center">
+  <button onclick="endSync()"  class="btn btn-primary btn-width" id="sync" type="button">Save to database</button>
+  <button onclick="window.close();"  class="btn btn-primary btn-width" type="button">Cancel</button>
+  </div>
+  <h1 class="page-header" align="center" >Modifications</h1>
+  <div  class="table-responsive">
+    <table class="table table-striped tblsearch" id="tblsearchitems" >
+      <thead>
+        <tr>
+          <td width="20%" align="center"><b>Nom de table</td>
+          <td width="20%" align="center"><b>Champ</td>
+          <td width="20%" align="center"><b>Ancient</td>
+          <td width="20%" align="center"><b>Changement</td>
+        </tr>
+      </thead>
+      <tbody id="tblsearchitemsbody">
+      </tbody>
+    </table>
+      <h1 class="page-header" align="center" >Ajouts</h1>
+    <table class="table table-striped tblsearch" id="tblajout" >
+      <thead>
+        <tr>
+          <td width="33%" align="center"><b>ID</td>
+          <td width="33%" align="center"><b>Nom de table</td>
+          <td width="33%" align="center"><b>Nouveau</td>
+
+        </tr>
+      </thead>
+      <tbody id="tblajout">
+      </tbody>
+    </table>
+    <h1 class="page-header" align="center" >Delete</h1>
+  <table class="table table-striped tblsearch" id="tbldelete" >
+    <thead>
+      <tr>
+        <td width="33%" align="center"><b>ID</td>
+        <td width="33%" align="center"><b>Nom de table</td>
+      </tr>
+    </thead>
+    <tbody id="tbldelete">
+    </tbody>
+  </table>
+  </div>
+
+
+
+</body>
+  <script src="js/main.js"></script>
+</html>

@@ -1,23 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
   <head>
     <script src="lib/jquery.min.js"></script>
     <script src="jqueryCookie/jquery_cookie.js"></script>
-    <script src="lib/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/main.js"></script>
-    <script type="text/javascript" src="js/ajaxSQLDB.js"></script>
     <script type="text/javascript" src="js/indexedDB.js"></script>
-    <script type="text/javascript" src="js/modifications.js"></script>
+    <script src="lib/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/site.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Search</title>
+    <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
-    <title>Synchro</title>
-
   </head>
+
   <form method="post" action="">
     <body>
       <nav class="navbar navbar-inverse navbar-fixed-top">
@@ -43,33 +42,36 @@
       </nav>
       <div class="container-fluid" >
         <div class="row" >
-          <h1 class="page-header">Synchronisation</h1>
+          <h1 class="page-header">Recherche Site</h1>
           <div class="table-responsive container">
             <div class="row">
               <div class="panel panel-default">
-                <div class="table-responsive">
-                  <table class="table table-striped">
-                    <thead>
+                <h4>
+                  Code Site
+                </h4>
+                <table class="table table-striped tblsearch">
+                  <tr>
+                    <td><input type="text" id="fsite"></td>
+                    <td colspan="2" align="left">
+                      <button onclick="readSite()" id="buttonsearch" class="btn btn-primary btn-width" type="button">Recherche </button>
+                      <button onclick="readAllSites()" id="buttonsearchall" class="btn btn-primary btn-width" type="button">Tous les sites </button>
+                      <button onclick="openSite(0)" id="buttonadd" class="btn btn-primary btn-width" type="button">Ajout Site </button>
+                    </td>
+                  </tr>
+                </table>
+                <table class="table table-striped tblsearch table-fixed" id="tblsearchsites" >
+                  <thead>
                     <tr>
-                      <td align="center" colspan=1>
-                         <button id="syncButton" onclick="Synchronisation()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>Synchronisation</span></button>
-                         <button id="endSynchro" onclick="openModifs()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>2e sync</span></button>
-                         <!-- div de l'animation -->
-                      <div id="divLoad" class="noLoader"></div>
-                      <div id="divText"></div>
-                       </td>
+                      <th class="col-xs-3" style="text-align:center;">Code</th>
+                      <th class="col-xs-6" >Site</th>
+                      <th class="col-xs-3" style="text-align:center;">Compagnie</th>
                     </tr>
-                    <tr>
-                      <td align="center">
-                         <button onclick="fnDelete()" class="buttonDel" width="100px" type="button"><span>Delete database </span></button>
-                         <button onclick="CreateFakeTab()" class="buttonDel" width="100px" type="button"><span>Fake table </span></button>
-                       </td>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    </tbody>
-                  </table>
-                </div>
+                  </thead>
+                  <tbody id="tblsearchsitesbody">
+                  </tbody>
+                  <tfoot>
+                  </tfoot>
+                </table>
               </div>
             </div>
           </div>

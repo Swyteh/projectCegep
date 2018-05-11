@@ -1,52 +1,88 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
   <head>
     <script src="lib/jquery.min.js"></script>
     <script type="text/javascript" src="js/indexedDB.js"></script>
     <script src="lib/bootstrap.min.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/items.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="lib/jquery.min.js"></script>
-    <title>Add</title>
+    <title>Add item</title>
 
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
+    <script src="jqueryCookie/jquery_cookie.js"></script>
   </head>
-  <h1 class="page-header">Ajout Item</h1>
-  <h2 class="sub-header"></h2>
-  <div class="table-responsive">
-    <table class="table table-striped" >
-      <thead>
-        <tr>
-          <td width="20%" align="center">Code item</td>
-          <td width="40%" align="center">Description</td>
-          <td width="10%" align="center">Quantitée</td>
-          <td width="10%" align="center">Actif</td>
-          <td width="10%" align="center">Location</td>
-          <td width="10%" align="center">Unité</td>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td align="center"><input type="text" id="fitemcode" style="width:140px"></td>
-          <td align="center"><textarea rows="2" cols="50" id="fitemdescr"></textarea></td>
-          <td align="center"><input type="text" id="fitemqte" style="width:70px"></td>
-          <td align="center"><input type="checkbox" id="fitemactif" checked ></td>
-          <td align="center"><select id="floc" >
-          </select></td>
-          <td align="center"><select id="fuom" >
-          </select></td>
-        </tr>
-        <tr>
-          <td colspan="4"><button onclick="add()">Add item</button></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <script src="js/main.js"></script>
+  <form method="post" action="">
+    <body onload="readInfoItem()">
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+          <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+              <span class="sr-only">Toggle navigation</span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+              <span class="icon-bar"></span>
+            </button>
+          </div>
+          <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+              <li><a href="#" id="searchtab" >Items</a></li>
+              <li><a href="#" id="loctab" >Locations</a></li>
+              <li><a href="#" id="sitestab" >Sites</a></li>
+              <li><a href="#" id="serialtab" >Items (# série)</a></li>
+              <li><a href="#" id="synchrotab" >Synchronisation</a></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+      <h1 class="page-header">Ajout Item</h1>
+      <div class="table-responsive">
+        <table class="table table-striped" id="tblinfoitem">
+          <thead>
+            <tr>
+              <td width="20%" align="center">Code item</td>
+              <td width="40%" align="center">Description</td>
+              <td width="10%" align="center">Actif</td>
+              <td width="20%" align="center">Unité</td>
+            </tr>
+          </thead>
+          <tbody id="addLine">
+            <tr>
+              <td align="center"><input type="text" id="fitemcode" style="width:140px;"></td>
+              <td align="center"><textarea rows="2" cols="50" id="fitemdescr"></textarea></td>
+              <td align="center"><input type="checkbox" id="fitemactif" checked ></td>
+              <td align="center"><select id="fuom" >
+              </select></td>
+            </tr>
+          </tbody>
+        </table>
+        <table class="table table-striped" id="tblinfoitemsite" style="display:none;">
+          <thead>
+            <tr>
+              <td align="center">Site</td>
+              <td align="center">Location</td>
+              <td align="center">Quantitée</td>
+              <td></td>
+            </tr>
+          </thead>
+          <tbody id="locLine">
+          </tbody>
+          <tbody id="locAdd">
+            <tr>
+              <td align="center"><select id="fsite"></select></td>
+              <td align="center"><select id="floc"></select></td>
+              <td align="center"><input type="number" id="fqte" style="width:70px;" value="0" min="0"></td>
+              <td align="center"><button onclick="addLoc()" class="btn btn-primary" type="button">Ajouter</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </body>
+  </form>
 </html>

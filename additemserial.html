@@ -1,23 +1,25 @@
-
 <!DOCTYPE html>
+
 <html lang="en">
-<!-- <html lang="en" manifest="manifest.appcache"> -->
 
   <head>
-    <script type="text/javascript" src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
     <script src="jqueryCookie/jquery_cookie.js"></script>
+    <script type="text/javascript" src="js/indexedDB.js"></script>
     <script src="lib/bootstrap.min.js"></script>
-    <script src="js/main.js?v=1"></script>
+    <script src="js/main.js"></script>
+    <script src="js/itemsserial.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Add item</title>
+
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
   </head>
   <form method="post" action="">
-    <body>
+    <body onload="readInfoItem()">
       <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -39,11 +41,31 @@
           </div>
         </div>
       </nav>
-
-      <!-- Bootstrap core JavaScript
-      ================================================== -->
-      <!-- Placed at the end of the document so the pages load faster -->
-      <img class="centered" src="prextra.png">
+      <h1 class="page-header">Ajout Item</h1>
+      <div class="table-responsive">
+        <table class="table table-striped" id="tblinfoitem">
+          <thead>
+            <tr>
+              <td width="15%" align="center">Code item</td>
+              <td width="20%" align="center"># Série</td>
+              <td width="20%" align="center">Site</td>
+              <td width="20%" align="center">Location</td>
+              <td width="15%" align="center">Quantitée</td>
+              <td width="10%" align="center">Actif</td>
+            </tr>
+          </thead>
+          <tbody id="addLine">
+            <tr>
+              <td align="center"><input type="text" id="fitem" ><input type="hidden" id="fitemid" ></td>
+              <td align="center"><input type="text" id="fserial"></td>
+              <td align="center"><select id="fsite" ></select></td>
+              <td align="center"><select id="floc" ></select></td>
+              <td align="center"><input type="number" id="fqte" value ="0"min="0"></td>
+              <td align="center"><input type="checkbox" id="fitemactif" checked ></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </body>
   </form>
 </html>

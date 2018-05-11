@@ -1,0 +1,29 @@
+CACHE MANIFEST
+# 2018-04-20:v1
+#Les dossiers mis en cache
+CACHE:
+js/main.js
+js/site.js
+js/items.js
+js/locations.js
+js/modifications.js
+js/indexedDB.js
+js/ajaxSQLDB.js
+lib/angular.min.js
+lib/bootstrap.min.js
+lib/jquery-3.3.1.js
+lib/jquery.min.js
+css/style.css
+css/bootstrap.min.css
+addsite.html
+additem.html
+modifications.html
+manifest.appcache
+search.html
+synchro.html
+style.css
+jqueryCookie/jquery_cookie.js
+
+#Destination si un erreur survient
+FALLBACK:
+index.html

@@ -1,142 +1,295 @@
 
-function readItem() {
-  request = window.indexedDB.open("prextraDB",2);
-  request.onsuccess = function(event) {
-    $('#tblsearchitems tbody').empty();
-    var x = document.getElementById("fitem").value;
-    var active = document.getElementById("factifslm").checked;
-    var db = request.result
-    .transaction("items", "readwrite")
-    .objectStore("items")
-    .index("by_itemcode");
-    var getItem = db.get(x);
-    var getKey = db.getKey(x);
+var windowItem
+function openItem(itemid) {
+  $(function(){
+    $.cookie("itemid", itemid);
+    $('form').attr('action', 'additem.html');
+    $('form').submit();
+  });
+}
 
-    getItem.onsuccess = function() {
-      getKey.onsuccess = function() {
-        if (active) {
-          if (getItem.result.isActive == 1) {
-            $('#tblsearchitems tbody').append('<tr id="'+getKey.result+'""><td align="center">'+getItem.result.itemcode+'</td><td align="center">'+getItem.result.descr+'</td><td align="center"></td><td align="center">'+getItem.result.isActive+'</td><td align="center"><button onclick="remove('+getKey.result+')">Delete item</button></td></tr>');
-          } else {
-            alert("Aucun d'item trouvé");
+function openSearchItem() {
+  $(function(){
+    $('form').attr('action', 'searchitem.html');
+    $('form').submit();
+  });
+}
+
+function openItemSerial(itemid) {
+  $(function(){
+    $.cookie("serialid", itemid);
+    $('form').attr('action', 'additemserial.html');
+    $('form').submit();
+  });
+}
+
+function openSearchItemSerial(byitem,itemid) {
+  if (byitem) {
+    $.cookie("byitem",1);
+    $.cookie("byitemid",itemid)
+  } else {
+    $.cookie("byitem",2);
+  }
+  $(function(){
+    $('form').attr('action', 'searchitemserial.html');
+    $('form').submit();
+  });
+}
+
+function openLoc(idLoc) {
+  $(function(){
+    $.cookie("locid", idLoc);
+    $('form').attr('action', 'addloc.html');
+    $('form').submit();
+  });
+}
+
+function openSearchLoc() {
+  $(function(){
+    $('form').attr('action', 'searchloc.html');
+    $('form').submit();
+  });
+}
+
+function openSite(idSite) {
+  $(function(){
+    $.cookie("siteid", idSite);
+    $('form').attr('action', 'addsite.html');
+    $('form').submit();
+  });
+}
+
+function openSearchSite() {
+  $(function(){
+    $('form').attr('action', 'searchsites.html');
+    $('form').submit();
+  });
+}
+
+function addModif(mfield, mid, mvalue, mtable){
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    request.onsuccess = function(event) {
+      var db = event.target.result.transaction(["modifications"], "readwrite")
+      .objectStore("modifications")
+      .add({ field: mfield, id: parseInt(mid), newvalue: mvalue, tablename: mtable});
+      db.onsuccess = function(event) {
+        resolve("modif");
+      };
+      db.onerror = function(event) {
+         reject(request.error);
+      };
+    };
+  });
+}
+
+function addAdd(mid, mtable){
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    request.onsuccess = function(event) {
+      var db = event.target.result.transaction(["newdata"], "readwrite")
+      .objectStore("newdata")
+      .add({ addid:parseInt(mid), tablename: mtable});
+      db.onsuccess = function(event) {
+        resolve("modif");
+      };
+      db.onerror = function(event) {
+         reject(request.error);
+      };
+    };
+  });
+}
+
+function addDel(mid, mtable){
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    request.onsuccess = function(event) {
+      var db = event.target.result.transaction(["deldata"], "readwrite")
+      .objectStore("deldata")
+      .add({ delid:parseInt(mid), tablename: mtable});
+      db.onsuccess = function(event) {
+        resolve("modif");
+      };
+      db.onerror = function(event) {
+         reject(request.error);
+      };
+    };
+  });
+}
+
+function checkExists(){
+
+  var request = indexedDB.open("prextraDB",2);
+  request.onsuccess = function(event) {
+    var db = event.target.result;
+    if (!db.objectStoreNames.contains("items")){
+      document.getElementById("buttonsearch").disabled = true;
+      document.getElementById("buttonsearchall").disabled = true;
+      document.getElementById("buttonadd").disabled = true;
+
+      alert("Vous devez d'abords synchroniser votre base de donnée.");
+    }
+
+  };
+}
+
+function getqte(object){
+  var id = object.id;
+  var qte = 0;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("itemsite", "readwrite")
+      .objectStore("itemsite");
+      db.openCursor().onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          if (cursor.value.itemid == id) {
+            qte = parseInt(qte) + parseInt(cursor.value.qtyonhand);
           }
+          cursor.continue();
         } else {
-          if (getItem.result) {
-            $('#tblsearchitems tbody').append('<tr id="'+getKey.result+'""><td align="center">'+getItem.result.itemcode+'</td><td align="center">'+getItem.result.descr+'</td><td align="center"></td><td align="center">'+getItem.result.isActive+'</td><td align="center"><button onclick="remove('+getKey.result+')">Delete item</button></td></tr>');
-          } else {
-            alert("Aucun d'item trouvé");
-          }
+          resolve(qte);
         }
       };
     };
-  };
+    request.onerror = function(event){
+      reject(request.error);
+    };
+  });
 }
 
-function readAllItems() {
-  request = window.indexedDB.open("prextraDB",2);
-  request.onsuccess = function(event) {
-    var active = document.getElementById("factifslm").checked;
-    $('#tblsearchitems tbody').empty();
-    var db = request.result
-    .transaction("items", "readwrite")
-    .objectStore("items")
-
-    db.openCursor().onsuccess = function(event) {
-       var cursor = event.target.result;
-
-       if (cursor) {
-         if (active) {
-           if (cursor.value.isActive == 1) {
-             $('#tblsearchitems tbody').append('<tr id="'+cursor.key+'""><td align="center">'+cursor.value.itemcode+'</td><td align="center">'+cursor.value.descr+'</td><td align="center"></td><td align="center">'+cursor.value.isActive+'</td><td align="center"><button onclick="remove('+cursor.key+')">Delete item</button></td></tr>');
-             cursor.continue();
-           }
-         }
-         else {
-           $('#tblsearchitems tbody').append('<tr id="'+cursor.key+'""><td align="center">'+cursor.value.itemcode+'</td><td align="center">'+cursor.value.descr+'</td><td align="center"></td><td align="center">'+cursor.value.isActive+'</td><td align="center"><button onclick="remove('+cursor.key+')">Delete item</button></td></tr>');
-           cursor.continue();
-         }
-       }
-    };
-  };
-}
-
-function iframeOnload(event, callback) {
-  if (event.src) {
-    callback();
-  }
-}
-
-function loadAdd() {
-  request = window.indexedDB.open("prextraDB",2);
-  request.onsuccess = function(event) {
-    var floc = $('#floc',window.parent.frames[0].document);
-    var fuom = $('#fuom',window.parent.frames[0].document);
-    floc.empty();
-    floc.append('<option value="0"></option>');
-    fuom.empty();
-    fuom.append('<option value="0"></option>');
-    var db = request.result
-    .transaction("locations", "readwrite")
-    .objectStore("locations")
-
-    db.openCursor().onsuccess = function(event) {
-      var cursor = event.target.result;
-      if (cursor) {
-        floc.append('<option value="'+cursor.key+'">'+cursor.value.Name+'</option>');
-        cursor.continue();
-      }
-    };
-    db = request.result
-    .transaction("uom", "readwrite")
-    .objectStore("uom")
-
-    db.openCursor().onsuccess = function(event) {
-      var cursor = event.target.result;
-      if (cursor) {
-        fuom.append('<option value="'+cursor.key+'">'+cursor.value.name+'</option>');
-        cursor.continue();
-      }
-    };
-  };
-}
-
-function add() {
-  request = window.indexedDB.open("prextraDB",2);
-  request.onsuccess = function(event) {
-    var code = document.getElementById("fitemcode").value;
-    var descr = document.getElementById("fitemdescr").value;
-    var active = document.getElementById("factifslm").checked;
-    if (active) {
-      var actif = 1;
-    } else {
-      var actif = 0;
-    }
-    var loc = document.getElementById("floc").value;
-    var uom = document.getElementById("fuom").value;
-    var request = db.transaction(["items"], "readwrite")
-    .objectStore("items")
-    .add({ itemcode: code, descr: descr, isActive: parseInt(actif), locid: loc, uomid: uom});
-
-    request.onsuccess = function(event) {
-       alert(code + " has been added to your database.");
-    };
-
-    request.onerror = function(event) {
-       alert("Unable to add this item\r\n"+code+" is aready exist in your database! ");
-    }
-  }
-
-  function remove(x) {
+function getqteserial(object){
+  var id = object.id;
+  var qte = 0;
+  return new Promise(function(resolve,reject){
     request = window.indexedDB.open("prextraDB",2);
-    var request = db.transaction(["items"], "readwrite")
-    .objectStore("items")
-    .delete(x);
-
     request.onsuccess = function(event) {
-      $('#'+x+'').remove();
-       alert("Item suprimé");
+      var db = event.target.result
+      .transaction("itemserial", "readwrite")
+      .objectStore("itemserial");
+      db.openCursor().onsuccess = function(event) {
+        var cursor = event.target.result;
+        if (cursor) {
+          if (cursor.value.itemid == id) {
+            qte = parseInt(qte) + parseInt(cursor.value.qtyonhand);
+          }
+          cursor.continue();
+        } else {
+          resolve(qte);
+        }
+      };
     };
-  };
+    request.onerror = function(event){
+      reject(request.error);
+    };
+  });
+}
+
+function getItemDescr(objet){
+  var itemid = objet.itemid;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    //console.log(objet);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("items", "readwrite")
+      .objectStore("items");
+      var getDescr = db.get(itemid);
+      getDescr.onsuccess = function() {
+        resolve(getDescr.result.descr);
+      };
+    };
+    request.onerror = function(event){
+        reject(request.error);
+    };
+  });
+}
+
+function getItemCode(objet){
+  var itemid = objet.itemid;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    //console.log(objet);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("items", "readwrite")
+      .objectStore("items");
+      var getCode = db.get(itemid);
+      getCode.onsuccess = function() {
+        resolve(getCode.result.itemcode);
+      };
+    };
+    request.onerror = function(event){
+        reject(request.error);
+    };
+  });
+}
+
+function getCompanyName(objet){
+  var cieid = objet.cieid;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    //console.log(objet);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("companies", "readwrite")
+      .objectStore("companies")
+      .index("by_cieid");
+      var getCompany = db.get(cieid);
+      getCompany.onsuccess = function() {
+        if (cieid == 0) {
+          resolve("");
+        } else {
+          resolve(getCompany.result.name);
+        }
+      };
+    };
+    request.onerror = function(event){
+        reject(request.error);
+    };
+  });
+}
+
+function getSiteName(objet){
+  var siteid = objet.siteid;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    //console.log(objet);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("sites", "readwrite")
+      .objectStore("sites");
+      var getSite = db.get(siteid);
+      getSite.onsuccess = function() {
+        resolve(getSite.result.name);
+        };
+    };
+    request.onerror = function(event){
+        reject(request.error);
+    };
+  });
+}
+
+function getLocName(objet){
+  var locid = objet.locid;
+  return new Promise(function(resolve,reject){
+    request = window.indexedDB.open("prextraDB",2);
+    //console.log(objet);
+    request.onsuccess = function(event) {
+      var db = event.target.result
+      .transaction("locations", "readwrite")
+      .objectStore("locations");
+      var getLoc = db.get(locid);
+      getLoc.onsuccess = function() {
+        resolve(getLoc.result.Name);
+        };
+    };
+    request.onerror = function(event){
+        reject(request.error);
+    };
+  });
 }
 
 $(function(){
@@ -148,21 +301,30 @@ $(function(){
           $(this).addClass('active');
    });
    $('#searchtab').click(function() {
-          $('#frametab').attr('src','search.html')
-   });
-   $('#additemstab').click(function() {
-          $('#frametab').attr('src','additem.html')
+     $('form').attr('action', 'searchitem.html')
+     $('form').submit();
    });
    $('#loctab').click(function() {
-          $('#frametab').attr('src','loc.html')
+     $('form').attr('action', 'searchloc.html')
+     $('form').submit();
    });
    $('#sitestab').click(function() {
-          $('#frametab').attr('src','sites.html')
+     $('form').attr('action', 'searchsites.html')
+     $('form').submit();
    });
    $('#serialtab').click(function() {
-          $('#frametab').attr('src','serials.html')
+     $.cookie("byitem",2);
+     $('form').attr('action', 'searchitemserial.html')
+     $('form').submit();
    });
    $('#synchrotab').click(function() {
-          $('#frametab').attr('src','synchro.html')
+     $('form').attr('action', 'synchro.html')
+     $('form').submit();
+   });
+   $('#modifstab').click(function() {
+          $('#frametab').attr('src','modifications.html')
+   });
+   $('#addtab').click(function() {
+          $('#frametab').attr('src','new.html')
    });
 });

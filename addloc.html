@@ -1,23 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="en">
-<!-- <html lang="en" manifest="manifest.appcache"> -->
 
   <head>
-    <script type="text/javascript" src="lib/jquery.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
     <script src="jqueryCookie/jquery_cookie.js"></script>
+    <script type="text/javascript" src="js/indexedDB.js"></script>
     <script src="lib/bootstrap.min.js"></script>
-    <script src="js/main.js?v=1"></script>
+    <script src="js/main.js"></script>
+    <script src="js/location.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Add loc</title>
+
     <!-- Bootstrap core CSS -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/style.css" rel="stylesheet">
   </head>
   <form method="post" action="">
-    <body>
+    <body onload="readInfoLoc()">
       <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -39,11 +40,26 @@
           </div>
         </div>
       </nav>
-
-      <!-- Bootstrap core JavaScript
-      ================================================== -->
-      <!-- Placed at the end of the document so the pages load faster -->
-      <img class="centered" src="prextra.png">
+      <h1 class="page-header">Ajout Location</h1>
+      <div class="table-responsive">
+        <table class="table table-striped" id="tblinfoloc">
+          <thead>
+            <tr>
+              <td width="30%" align="center">Code</td>
+              <td width="50%" align="center">Nom</td>
+              <td width="20%" align="center">Site</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td align="center"><input type="text" id="floccode" style="width:140px;"></td>
+              <td align="center"><input type="text" id="flocname" style="width:300px;"></td>
+              <td align="center"><select id="fsites" >
+              </select></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </body>
   </form>
 </html>
