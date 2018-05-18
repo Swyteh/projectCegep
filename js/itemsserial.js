@@ -100,7 +100,7 @@ function readItem() {
             });
           }
         } else {
-          alert("Aucun item trouvé");
+          alert("No serial number found");
         }
       };
     };
@@ -330,17 +330,17 @@ function addItem() {
       .objectStore("itemserial")
       .add({ itemid: parseInt(item), serialno: serial, isactive: parseInt(actif), siteid: parseInt(site), locid: parseInt(location), qtyonhand: parseInt(qte)});
       db.onsuccess = function(event) {
-         alert(serial + " a été ajouté.");
-         addAdd(event.target.result, "itemserial").then(function(modif){
+         alert(serial + " added to your database.");
+         addAdd(event.target.result, "itemserial", serial).then(function(modif){
            openSearchItemSerial(false);
          });
       };
 
       db.onerror = function(event) {
-         alert("Erreur");
+         alert("Error");
       };
     } else {
-      alert("Données manquantes");
+      alert("Missing field(s)");
     }
   };
 }
@@ -348,6 +348,8 @@ function addItem() {
 function updateItem() {
   var cookieValue = $.cookie("serialid");
   var itemserial = parseInt(cookieValue);
+  cookieValue = $.cookie("name");
+  var name = cookieValue;
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var site = parseInt(document.getElementById("fsite").value);
@@ -372,10 +374,10 @@ function updateItem() {
       var updatedItem = db.put(data);
       alert(data.serialno + " has been updated to your database.");
 
-      addModif("siteid",itemserial,String(site),"itemserial").then(function(modif){
-        addModif("locid",itemserial,String(location),"itemserial").then(function(modif){
-          addModif("qtyonhand",itemserial,String(qte),"itemserial").then(function(modif){
-            addModif("isactive",itemserial,String(actif),"itemserial").then(function(modif){
+      addModif("siteid",itemserial,String(site),"itemserial", name).then(function(modif){
+        addModif("locid",itemserial,String(location),"itemserial", name).then(function(modif){
+          addModif("qtyonhand",itemserial,String(qte),"itemserial", name).then(function(modif){
+            addModif("isactive",itemserial,String(actif),"itemserial", name).then(function(modif){
               openSearchItemSerial(false);
             });
           });
@@ -390,17 +392,20 @@ function updateItem() {
 
 //delete un item
 function remove() {
-  if (confirm("Êtes-vous sûr de vouloir supprimer cet item?")){
+  if (confirm("Are you sure you want to delete this serial number?")){
     var cookieValue = $.cookie("serialid");
     var item = parseInt(cookieValue);
+    cookieValue = $.cookie("name");
+    var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
       var db = event.target.result.transaction(["itemserial"], "readwrite")
       .objectStore("itemserial")
       .delete(item);
       db.onsuccess = function(event) {
-        alert("# Série supprimé");
-        addDel(item,"itemserial").then(function(modif){
+        alert(db.result.serialno);
+        alert("Serial number deleted");
+        addDel(item,"itemserial",name).then(function(modif){
           openSearchItemSerial(false);
         });
       };
@@ -449,6 +454,7 @@ function readInfoItem() {
           } else {
             isActive = false;
           }
+          $.cookie("name", itemInfo.serial);
           getItemCode(itemInfo).then(function(codereturn){
             $('#fitem').val(codereturn);
             $('#fitem').prop('disabled', true);
@@ -487,7 +493,7 @@ function checkCode(itemcode){
         if (getItem.result) {
         $('#fitemid').val(getKey.result);
         } else {
-          alert("Cet item n'existe pas");
+          alert("This serial number does not exist");
           $('#fitem').val("");
           $('#fitem').focus();
         }

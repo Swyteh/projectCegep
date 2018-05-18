@@ -24,7 +24,7 @@ function readSite() {
   request.onsuccess = function(event) {
     $('#tblsearchsites tbody').empty();
     $('#tblsearchsites tfoot').empty();
-    var x = document.getElementById("fsite").value;
+    var x = document.getElementById("fitem").value;
     var db = request.result
     .transaction("sites", "readwrite")
     .objectStore("sites")
@@ -41,12 +41,12 @@ function readSite() {
           getCompanyName(siteID).then(function(ciename){
             $('#tblsearchsites tbody').append(
               '<tr id="'+getKey.result+'" onclick="openSite('+getKey.result+');" >'+
-              '<td align="center" class="col-xs-3">'+getSite.result.code+'</td>'+
+              '<td align="center" class="col-xs-3">'+getSite.result.sitecode+'</td>'+
               '<td align="center" class="col-xs-6">'+getSite.result.name+'</td>'+
               '<td align="center" class="col-xs-3">'+ciename+'</td></tr>');
           });
         } else {
-          alert("Aucun site trouvé");
+          alert("No site found");
         }
       };
     };
@@ -87,7 +87,7 @@ function readAllSites() {
         } else {
           var siteInfo = {
             name:cursor.value.name,
-            sitecode:cursor.value.sitecode,
+            code:cursor.value.sitecode,
             cieid:cursor.value.cieid,
             key:cursor.key
           }
@@ -95,7 +95,7 @@ function readAllSites() {
             getCompanyName(siteInfo).then(function(ciename){
               $('#tblsearchsites tbody').append(
                 '<tr id="'+siteInfo.key+'" onclick="openSite('+siteInfo.key+');" >'+
-                '<td align="center" class="col-xs-3">'+siteInfo.sitecode+'</td>'+
+                '<td align="center" class="col-xs-3">'+siteInfo.code+'</td>'+
                 '<td align="center" class="col-xs-6">'+siteInfo.name+'</td>'+
                 '<td align="center" class="col-xs-3">'+ciename+'</td></tr>');
             });
@@ -146,15 +146,15 @@ function addSite() {
 
       db.onsuccess = function(event) {
         alert(code + " has been added to your database.");
-        addAdd(event.target.result,"sites").then(function(modif){
+        addAdd(event.target.result,"sites", name).then(function(modif){
           openSearchSite();
         });
       };
       db.onerror = function(event) {
-        alert("Erreur")
+        alert("Error")
       }
     } else {
-      alert("Données manquantes");
+      alert("Missing field(s)");
     }
   };
 }
@@ -162,6 +162,8 @@ function addSite() {
 function updateSite() {
   var cookieValue = $.cookie("siteid");
   var site = parseInt(cookieValue);
+  cookieValue = $.cookie("name");
+  var name = cookieValue;
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var code = document.getElementById("fsitecode").value;
@@ -178,9 +180,9 @@ function updateSite() {
       data.cieid = cie;
       var updatedSite = db.put(data);
       alert(code + " has been updated to your database.");
-      addModif("sitecode",site,String(code),"sites").then(function(modif){
-        addModif("name",site,String(name),"sites").then(function(modif){
-          addModif("cieid",site,String(cie),"sites").then(function(modif){
+      addModif("sitecode",site,String(code),"sites", name).then(function(modif){
+        addModif("name",site,String(name),"sites", name).then(function(modif){
+          addModif("cieid",site,String(cie),"sites", name).then(function(modif){
             openSearchSite();
           });
         });
@@ -203,7 +205,29 @@ function checkItem(){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.siteid == site){
-          alert("Ce site est relié a un item et ne peut être supprimé");
+          alert("This site is use");
+          return;
+        }
+        cursor.continue();
+      } else {
+        checkItemSerial();
+      }
+    };
+  };
+}
+
+function checkItemSerial(){
+  var cookieValue = $.cookie("siteid");
+  var site = parseInt(cookieValue);
+  request = window.indexedDB.open("prextraDB",2);
+  request.onsuccess = function(event) {
+    var db = event.target.result.transaction(["itemserial"], "readwrite")
+    .objectStore("itemserial");
+    db.openCursor().onsuccess = function(event){
+      var cursor = event.target.result;
+      if (cursor){
+        if (cursor.value.siteid == site){
+          alert("This site is use");
           return;
         }
         cursor.continue();
@@ -215,9 +239,11 @@ function checkItem(){
 }
 
 function remove(){
-  if (confirm("Êtes-vous sûr de vouloir supprimer ce site?")){
+  if (confirm("Are you sure you want to delete this site?")){
     var cookieValue = $.cookie("siteid");
     var site = parseInt(cookieValue);
+    cookieValue = $.cookie("name");
+    var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
       var db = event.target.result.transaction(["sites"], "readwrite")
@@ -225,8 +251,8 @@ function remove(){
       .delete(site);
 
       db.onsuccess = function(event) {
-        alert("Site supprimé");
-        addDel(site,"sites").then(function(modif){
+        alert("Site deleted");
+        addDel(site,"sites",name).then(function(modif){
           getLocation(site);
         });
       };
@@ -243,7 +269,7 @@ function getLocation(site){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.siteid == site){
-          removeLoc(cursor.key);
+          removeLoc(cursor.key, cursor.value.Name);
         }
         cursor.continue();
       } else {
@@ -253,14 +279,16 @@ function getLocation(site){
   };
 }
 
-function removeLoc(id){
+function removeLoc(id, name){
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var db = event.target.result.transaction(["locations"], "readwrite")
     .objectStore("locations")
     .delete(id);
     db.onsuccess = function(event) {
-      console.log("location "+id+" deleted");
+      addDel(id,"locations",name).then(function(modif){
+        console.log("location "+id+" deleted");
+      });
     };
   };
 }
@@ -281,6 +309,7 @@ function readInfoSite() {
       .objectStore("sites");
       var getSite = db.get(site);
       getSite.onsuccess = function() {
+        $.cookie("name", getSite.result.name);
         $('#fsitecode').val(''+getSite.result.sitecode+'');
         $('#fsitename').val(''+getSite.result.name+'');
         loadCie(getSite.result.siteid);

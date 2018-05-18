@@ -94,14 +94,13 @@ function readItem() {
             });
           }
         } else {
-          alert("Aucun item trouvé");
+          alert("No item found");
         }
       };
     };
   };
 }
-//sort tout les items et tris si seulement actif est coché
-//function getqte ne fonctionne pas pour l'instant
+
 function readAllItems() {
   var itemcpt = 0;
   var itemstart = 0;
@@ -281,22 +280,22 @@ function addItem() {
       var getItemCode = db.index("by_itemcode").get(code);
       getItemCode.onsuccess = function() {
         if (getItemCode.result) {
-          alert("Ce code existe déjà");
+          alert("This code already exist");
         } else {
-          var addItem = db.add({ itemcode: code, descr: descr, isActive: parseInt(actif), uomid: parseInt(uom)});
+          var addItem = db.add({ itemcode: code, descr: descr, isActive: parseInt(actif), uomid: parseInt(uom), cieid: 1, siteid: 1, locid: 1, isserialno: 1, isserialnoqty: 0});
           addItem.onsuccess = function(event) {
              alert(code + " has been added to your database.");
-             addAdd(event.target.result,"items").then(function(modif){
+             addAdd(event.target.result,"items", descr).then(function(modif){
                openSearchItem();
              });
            }
          }
         db.onerror = function(event) {
-          alert("Erreur");
+          alert("Error");
         };
       };
     } else {
-      alert("Données manquantes");
+      alert("Missing field(s)");
     }
   };
 }
@@ -304,6 +303,8 @@ function addItem() {
 function updateItem() {
   var cookieValue = $.cookie("itemid");
   var item = parseInt(cookieValue);
+  cookieValue = $.cookie("name");
+  var name = cookieValue;
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var code = document.getElementById("fitemcode").value;
@@ -327,10 +328,10 @@ function updateItem() {
       data.uomid = uom;
       var updatedItem = db.put(data);
       alert(code + " has been updated to your database.");
-      addModif("itemcode",item,String(code),"items").then(function(modif){
-        addModif("descr",item,String(descr),"items").then(function(modif){
-          addModif("uom",item,String(uom),"items").then(function(modif){
-            addModif("isactive",item,String(actif),"items").then(function(modif){
+      addModif("itemcode",item,String(code),"items", name).then(function(modif){
+        addModif("descr",item,String(descr),"items", name).then(function(modif){
+          addModif("uom",item,String(uom),"items", name).then(function(modif){
+            addModif("isactive",item,String(actif),"items", name).then(function(modif){
               openSearchItem();
             });
           });
@@ -344,33 +345,41 @@ function updateItem() {
 }
 
 function updateloc(){
-  request = window.indexedDB.open("prextraDB",2);
-  request.onsuccess = function(event) {
-    itemsiteids.forEach(function(id){
-      var input = document.getElementById("loc"+id).value;
-      var db = event.target.result.transaction(["itemsite"], "readwrite")
-      .objectStore("itemsite");
-      var getItemSite = db.get(id);
-      getItemSite.onsuccess = function() {
-        var data = getItemSite.result;
-        data.qtyonhand = input;
-        var updateItemSite = db.put(data);
-        addModif("qtyonhand",id,String(input),"itemsite").then(function(modif){
-          updateItem();
-        });
-      };
-      db.onerror = function(event) {
-         alert("Unable to update this itemsite! ");
-      };
-    });
-  };
+  var cookieValue = $.cookie("name");
+  var name = cookieValue;
+  if (itemsiteids[0] === undefined){
+    updateItem();
+  } else {
+    request = window.indexedDB.open("prextraDB",2);
+    request.onsuccess = function(event) {
+      itemsiteids.forEach(function(id){
+        var input = document.getElementById("loc"+id).value;
+        var db = event.target.result.transaction(["itemsite"], "readwrite")
+        .objectStore("itemsite");
+        var getItemSite = db.get(id);
+        getItemSite.onsuccess = function() {
+          var data = getItemSite.result;
+          data.qtyonhand = input;
+          var updateItemSite = db.put(data);
+          addModif("qtyonhand",id,String(input),"itemsite", name).then(function(modif){
+            updateItem();
+          });
+        };
+        db.onerror = function(event) {
+           alert("Unable to update this itemsite! ");
+        };
+      });
+    };
+  }
 }
 
 //delete un item
 function remove() {
-  if (confirm("Êtes-vous sûr de vouloir supprimer cet item?")){
+  if (confirm("Are you sure you want to delete this item?")){
     var cookieValue = $.cookie("itemid");
     var item = parseInt(cookieValue);
+    cookieValue = $.cookie("name");
+    var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
 
@@ -379,7 +388,9 @@ function remove() {
         .objectStore("itemsite")
         .delete(id);
         db.onsuccess = function(event) {
-          console.log("itemsiteid"+id+" deleted");
+          addDel(id,"itemsite",name).then(function(modif){
+            alert("itemsiteid deleted");
+          });
         };
       });
 
@@ -387,7 +398,7 @@ function remove() {
       .objectStore("items")
       .delete(item);
       db.onsuccess = function(event) {
-        addDel(item,"items").then(function(modif){
+        addDel(item,"items", name).then(function(modif){
           getSerial(item);
         });
       };
@@ -404,7 +415,7 @@ function getSerial(itemid){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.itemid == itemid){
-          removeSerial(cursor.key);
+          removeSerial(cursor.key, cursor.value.serialno);
         }
         cursor.continue();
       } else {
@@ -414,14 +425,16 @@ function getSerial(itemid){
   };
 }
 
-function removeSerial(id){
+function removeSerial(id, serial){
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var db = event.target.result.transaction(["itemserial"], "readwrite")
     .objectStore("itemserial")
     .delete(id);
     db.onsuccess = function(event) {
-      console.log("itemserial"+id+" deleted");
+      addDel(id,"itemserial", serial).then(function(modif){
+        console.log("itemserial"+id+" deleted");
+      });
     };
   };
 }
@@ -447,6 +460,7 @@ function readInfoItem() {
         } else {
           isActive = false;
         }
+        $.cookie("name", getItem.result.descr);
         $('#fitemcode').val(''+getItem.result.itemcode+'');
         $('#fitemdescr').val(''+getItem.result.descr+'');
         $('#fitemactif').prop('checked', isActive);
@@ -466,49 +480,6 @@ function readInfoItem() {
     }
   };
 }
-
-// function loadItem(item,isserial){
-//   request = window.indexedDB.open("prextraDB",2);
-//   request.onsuccess = function(event) {
-//     if (isserial) {
-//       openSearchItemSerial(true);
-//     } else {
-//       if(item == 0) {
-//         loadAdd(0);
-//         $('#addLine').append('<tr><td colspan="4" align="center">'+
-//         '<button onclick="addItem()" class="btn btn-primary" type="button">Ajouter item</button></td></tr>');
-//       } else {
-//         var db = event.target.result
-//         .transaction("items", "readwrite")
-//         .objectStore("items");
-//         var getItem = db.get(item);
-//         getItem.onsuccess = function() {
-//           var isActive = getItem.result.isActive;
-//           if(isActive == 1){
-//             isActive = true;
-//           } else {
-//             isActive = false;
-//           }
-//           $('#fitemcode').val(''+getItem.result.itemcode+'');
-//           $('#fitemdescr').val(''+getItem.result.descr+'');
-//           $('#fitemactif').prop('checked', isActive);
-//           loadAdd(getItem.result.uomid);
-//           $('#addLine').append(
-//             '<tr><td colspan="4" align="center">'+
-//             '<button onclick="updateloc();" class="btn btn-primary" type="button">Modifier item</button>'+
-//             ' &nbsp<button onclick="remove();" class="btn btn-primary" type="button">Supprimer</button>'+
-//             '</td></tr>');
-//           document.getElementById("tblinfoitemsite").style.display = "";
-//           loadLocLine();
-//           $('#fsite').on('change', function() {
-//             addLocLineLoc( this.value );
-//           });
-//           addLocLineSite();
-//         };
-//       }
-//     }
-//   };
-// }
 
 function loadLocLine() {
   request = window.indexedDB.open("prextraDB",2);
@@ -554,7 +525,9 @@ function deleteLoc(itemsiteid) {
     .objectStore("itemsite")
     .delete(itemsiteid);
     db.onsuccess = function(event) {
-      $('#loc'+itemsiteid).remove();
+      addDel(itemsiteid,"itemsite").then(function(modif){
+        $('#loc'+itemsiteid).remove();
+      });
     };
   };
 }
@@ -621,11 +594,11 @@ function addLoc() {
         });
       };
       db.onerror = function(event) {
-         alert("Erreur");
+         alert("Error");
       }
 
     } else {
-      alert("données manquantes");
+      alert("Missing field(s)");
     }
   };
 }

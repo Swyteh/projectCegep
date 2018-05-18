@@ -17,7 +17,7 @@
     <link href="css/style.css" rel="stylesheet">
   </head>
 
-  <form method="post" action="">
+  <form method="get" action="">
     <body>
       <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
@@ -34,8 +34,8 @@
               <li><a href="#" id="searchtab" >Items</a></li>
               <li><a href="#" id="loctab" >Locations</a></li>
               <li><a href="#" id="sitestab" >Sites</a></li>
-              <li><a href="#" id="serialtab" >Items (# série)</a></li>
-              <li><a href="#" id="synchrotab" >Synchronisation</a></li>
+              <li><a href="#" id="serialtab" >Items (Serial number)</a></li>
+              <li><a href="#" id="synchrotab" >Synchronization</a></li>
             </ul>
           </div>
         </div>
@@ -51,7 +51,7 @@
                 </h4>
                 <table class="table table-striped tblsearch">
                   <tr>
-                    <td><input type="text" id="fsite"></td>
+                    <td><input type="text" id="fitem"></td>
                     <td colspan="2" align="left">
                       <button onclick="readSite()" id="buttonsearch" class="btn btn-primary btn-width" type="button">Recherche </button>
                       <button onclick="readAllSites()" id="buttonsearchall" class="btn btn-primary btn-width" type="button">Tous les sites </button>

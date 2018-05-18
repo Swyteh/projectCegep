@@ -18,8 +18,8 @@
     <title>Synchro</title>
 
   </head>
-  <form method="post" action="">
-    <body>
+  <form method="get" action="">
+    <body onload="checkOnline()">
       <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
           <div class="navbar-header">
@@ -35,15 +35,15 @@
               <li><a href="#" id="searchtab" >Items</a></li>
               <li><a href="#" id="loctab" >Locations</a></li>
               <li><a href="#" id="sitestab" >Sites</a></li>
-              <li><a href="#" id="serialtab" >Items (# série)</a></li>
-              <li><a href="#" id="synchrotab" >Synchronisation</a></li>
+              <li><a href="#" id="serialtab" >Items (Serial number)</a></li>
+              <li><a href="#" id="synchrotab" >Synchronization</a></li>
             </ul>
           </div>
         </div>
       </nav>
       <div class="container-fluid" >
         <div class="row" >
-          <h1 class="page-header">Synchronisation</h1>
+          <h1 class="page-header">Synchronization</h1>
           <div class="table-responsive container">
             <div class="row">
               <div class="panel panel-default">
@@ -52,17 +52,11 @@
                     <thead>
                     <tr>
                       <td align="center" colspan=1>
-                         <button id="syncButton" onclick="Synchronisation()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>Synchronisation</span></button>
-                         <button id="endSynchro" onclick="openModifs()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>2e sync</span></button>
+                         <button id="syncButton" onclick="Synchronisation()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>Database Synchronization</span></button>
+                         <button id="endSynchro" onclick="openModifs()" style="width:260px; height:80px;" class="btn btn-primary" width="100px" type="button"><span>Save changes</span></button>
                          <!-- div de l'animation -->
                       <div id="divLoad" class="noLoader"></div>
                       <div id="divText"></div>
-                       </td>
-                    </tr>
-                    <tr>
-                      <td align="center">
-                         <button onclick="fnDelete()" class="buttonDel" width="100px" type="button"><span>Delete database </span></button>
-                         <button onclick="CreateFakeTab()" class="buttonDel" width="100px" type="button"><span>Fake table </span></button>
                        </td>
                     </tr>
                     </thead>

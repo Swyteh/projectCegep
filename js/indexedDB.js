@@ -20,18 +20,18 @@ var tbl_del;
 
 var tbl_modif;
 var alertMsg = true;
-//met le bouton pas cliquable si on a pas de réseaux
 function checkOnline(){
   if (navigator.onLine == false){
-      document.getElementById("checkoutButton").disabled = true;
-  }
-  if (navigator.onLine == false){
-      console.log("offline");
-  }
+    document.getElementById("endSynchro").disabled = true;
+    console.log("offline");
+}
+
   if (navigator.onLine){
       console.log("online");
-  }
 }
+}
+
+
 // }
 //   console.log(navigator.onLine + " is online");
 //   document.getElementById("syncButton").disabled = true;
@@ -185,7 +185,7 @@ function Synchronisation(){
         tbl_locations.createIndex("by_locCode", "locCode", {unique: false} );
         tbl_sites.createIndex("by_sitecode", "sitecode", {unique: false} );
         tbl_companies.createIndex("by_cieid", "cieid", {unique: false} );
-        tbl_itemserial.createIndex("by_serial", "serial", {unique: false} );
+        tbl_itemserial.createIndex("by_serial", "serialno", {unique: false} );
         tbl_itemserial.createIndex("by_itemid", "itemid", {unique: false} );
         tbl_itemsite.createIndex("by_itemid", "itemid", {unique: false} );
         tbl_uom.createIndex("by_uom", "uomid", {unique: false} );

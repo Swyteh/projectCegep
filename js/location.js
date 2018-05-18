@@ -24,7 +24,7 @@ function readLoc() {
   request.onsuccess = function(event) {
     $('#tblsearchlocs tbody').empty();
     $('#tblsearchlocs tfoot').empty();
-    var x = document.getElementById("floc").value;
+    var x = document.getElementById("fitem").value;
     var db = event.target.result
     .transaction("locations", "readwrite")
     .objectStore("locations")
@@ -49,7 +49,7 @@ function readLoc() {
               '<td align="center" class="col-xs-3">'+sitename+'</td></tr>');
           });
         } else {
-          alert("Aucune location trouvé");
+          alert("No location found");
         }
       };
     };
@@ -150,16 +150,16 @@ function addLoc() {
 
       db.onsuccess = function(event) {
          alert(code + " has been added to your database.");
-         addAdd(event.target.result,"locations").then(function(modif){
+         addAdd(event.target.result,"locations", name).then(function(modif){
            openSearchLoc();
          });
       };
 
       db.onerror = function(event) {
-         alert("Erreur");
+         alert("Error");
       }
     } else {
-      alert("Données manquantes");
+      alert("Missing field(s)");
     }
   };
 }
@@ -167,6 +167,8 @@ function addLoc() {
 function updateLoc() {
   var cookieValue = $.cookie("locid");
   var loc = parseInt(cookieValue);
+  cookieValue = $.cookie("name");
+  var name = cookieValue;
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var code = document.getElementById("floccode").value;
@@ -183,9 +185,9 @@ function updateLoc() {
       data.siteid = site;
       var updatedLoc = db.put(data);
       alert(code + " has been updated to your database.");
-      addModif("locCode",loc,String(code),"locations").then(function(modif){
-        addModif("Name",loc,String(name),"locations").then(function(modif){
-          addModif("siteid",loc,String(site),"locations").then(function(modif){
+      addModif("locCode",loc,String(code),"locations", name).then(function(modif){
+        addModif("Name",loc,String(name),"locations", name).then(function(modif){
+          addModif("siteid",loc,String(site),"locations", name).then(function(modif){
             openSearchLoc();
           });
         });
@@ -211,7 +213,29 @@ function checkItem(){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.locid == loc){
-          alert("Cette location est relié a un item et ne peut être supprimé");
+          alert("This location is use");
+          return;
+        }
+        cursor.continue();
+      } else {
+        checkItemSerial();
+      }
+    };
+  };
+}
+
+function checkItemSerial(){
+  var cookieValue = $.cookie("locid");
+  var loc = parseInt(cookieValue);
+  request = window.indexedDB.open("prextraDB",2);
+  request.onsuccess = function(event) {
+    var db = event.target.result.transaction(["itemserial"], "readwrite")
+    .objectStore("itemserial");
+    db.openCursor().onsuccess = function(event){
+      var cursor = event.target.result;
+      if (cursor){
+        if (cursor.value.locid == loc){
+          alert("This location is use");
           return;
         }
         cursor.continue();
@@ -223,9 +247,11 @@ function checkItem(){
 }
 
 function remove() {
-  if (confirm("Êtes-vous sûr de vouloir supprimer cette location?")){
+  if (confirm("Are you sure you want to delete this location?")){
     var cookieValue = $.cookie("locid");
     var loc = parseInt(cookieValue);
+    cookieValue = $.cookie("name");
+    var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
       var db = event.target.result.transaction(["locations"], "readwrite")
@@ -233,8 +259,8 @@ function remove() {
       .delete(loc);
 
       db.onsuccess = function(event) {
-        alert("Item supprimé");
-        addDel(loc,"locations").then(function(modif){
+        alert("Location deleted");
+        addDel(loc,"locations",name).then(function(modif){
           openSearchLoc();
         });
       };
@@ -259,6 +285,7 @@ function readInfoLoc() {
       .objectStore("locations");
       var getLoc = db.get(loc);
       getLoc.onsuccess = function() {
+        $.cookie("name", getSite.result.Name);
         $('#floccode').val(''+getLoc.result.locCode+'');
         $('#flocname').val(''+getLoc.result.Name+'');
         loadSites(getLoc.result.siteid);

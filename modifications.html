@@ -4,6 +4,7 @@
   <head>
     <script src="lib/jquery.min.js"></script>
     <script src="jqueryCookie/jquery_cookie.js"></script>
+    <script src="js/main.js"></script>
     <script src="lib/bootstrap.min.js"></script>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -23,40 +24,38 @@
   </div>
   <h1 class="page-header" align="center" >Modifications</h1>
   <div  class="table-responsive">
-    <table class="table table-striped tblsearch" id="tblsearchitems" >
+    <table class="table table-striped tblsearch" id="tblmodif" >
       <thead>
         <tr>
-          <td width="20%" align="center"><b>Nom de table</td>
-          <td width="20%" align="center"><b>Champ</td>
-          <td width="20%" align="center"><b>Ancient</td>
-          <td width="20%" align="center"><b>Changement</td>
+          <td width="20%" align="center"><b>Table name</td>
+          <td width="20%" align="center"><b>Field</td>
+          <td width="20%" align="center"><b>Modification</td>
+          <td width="20%" align="center"><b>Code / Descritpion</td>
         </tr>
       </thead>
-      <tbody id="tblsearchitemsbody">
+      <tbody>
       </tbody>
     </table>
-      <h1 class="page-header" align="center" >Ajouts</h1>
+      <h1 class="page-header" align="center" >New data</h1>
     <table class="table table-striped tblsearch" id="tblajout" >
       <thead>
         <tr>
-          <td width="33%" align="center"><b>ID</td>
-          <td width="33%" align="center"><b>Nom de table</td>
-          <td width="33%" align="center"><b>Nouveau</td>
-
+          <td width="33%" align="center"><b>Table name</td>
+          <td width="33%" align="center"><b>Added data</td>
         </tr>
       </thead>
-      <tbody id="tblajout">
+      <tbody>
       </tbody>
     </table>
-    <h1 class="page-header" align="center" >Delete</h1>
+    <h1 class="page-header" align="center" >Deleted data</h1>
   <table class="table table-striped tblsearch" id="tbldelete" >
     <thead>
       <tr>
-        <td width="33%" align="center"><b>ID</td>
-        <td width="33%" align="center"><b>Nom de table</td>
+        <td width="33%" align="center"><b>Table name</td>
+        <td width="33%" align="center"><b>Deleted data </td>
       </tr>
     </thead>
-    <tbody id="tbldelete">
+    <tbody>
     </tbody>
   </table>
   </div>
@@ -64,5 +63,4 @@
 
 
 </body>
-  <script src="js/main.js"></script>
 </html>

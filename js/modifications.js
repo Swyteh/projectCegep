@@ -1,5 +1,8 @@
 var modif = 'modifications';
 var newdata = 'newdata';
+
+//checkNewAndDel();
+
 function openModifs() {
   windowItem = window.open("modifications.html", "_blank", "width=700,height=500,menubar=yes,location=yes,resizable=yes,scrollbars=yes,status=yes");
 }
@@ -11,7 +14,9 @@ var tableStructure = {
   "items":
     ["cieid","descr","isActive","isserialno","isserialnoqty","itemcode","locid","siteid","uomid"],
   "itemserial":
-    ["cieid","itemid","isActive","locid","qtyonhand","serialno","siteid"]
+    ["cieid","itemid","isActive","locid","qtyonhand","serialno","siteid"],
+  "itemsite":
+    ["cieid","itemsiteid","itemid","locid","siteid","qtyonhand","rankno"]
   }
 
 
@@ -30,21 +35,15 @@ function showAdd() {
       if (cursor){
         var newdataInfo = {
           tablename:cursor.value.tablename,
+          name:cursor.value.name,
           id:cursor.value.addid,
           key:cursor.key
         }
-
-        table =     '<tr id="'+newdataInfo.key+'" >';
-        table +=      '<td align="center">'+newdataInfo.id+'</td>';
-        table +=      '<td align="center">'+newdataInfo.tablename+'</td>';
-        table +=      '<td align="center">'+newdataInfo.tablename+'PH' + '</td>';
-
-        table +=      '<td><a onclick="removeAdd('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td>';
-
-
-        table +=    '</tr>';
-        $('#tblajout tbody').append(table);
-
+        $('#tblajout tbody').append(
+        '<tr id="'+newdataInfo.key+'" >'+
+        '<td align="center">'+newdataInfo.tablename+'</td>'+
+        '<td align="center">'+newdataInfo.name+'</td>'+
+        '<td><a onclick="removeAdd('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
 
         cursor.continue();
 
@@ -73,17 +72,16 @@ function showDel() {
       if (cursor){
         var newdataInfo = {
           tablename:cursor.value.tablename,
+          name:cursor.value.name,
           id:cursor.value.delid ,
           key:cursor.key
         }
 
-        table =     '<tr id="'+newdataInfo.key+'" >';
-        table +=      '<td align="center">'+newdataInfo.id+'</td>';
-        table +=      '<td align="center">'+newdataInfo.tablename+'</td>';
-        table +=      '<td><a onclick="removeDel('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td>';
-
-        table +=    '</tr>';
-        $('#tbldelete tbody').append(table);
+        $('#tbldelete tbody').append(
+        '<tr id="'+newdataInfo.key+'" >'+
+        '<td align="center">'+newdataInfo.tablename+'</td>'+
+        '<td align="center">'+newdataInfo.name+'</td>'+
+        '<td><a onclick="removeAdd('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
         cursor.continue();
       }
     };
@@ -109,30 +107,21 @@ function showModifs() {
       var cursor = event.target.result;
       if (cursor){
         var modifInfo = {
-          tablename:cursor.value.name,
+          tablename:cursor.value.tablename,
+          name:cursor.value.name,
           field:cursor.value.field,
           id:cursor.value.id,
           oldvalue:cursor.value.oldvalue,
           newvalue:cursor.value.newvalue,
           key:cursor.key
         }
-        //getCompanyName(modifInfo).then(function(ciename){
-
-        //  console.log(siteInfo);
-        table =     '<tr id="'+cursor.key+'" >';
-        //table +=      '<td align="center">'+cursor.value.id+'</td>';
-        table +=      '<td align="center">'+cursor.value.tablename+'</td>';
-        table +=      '<td align="center">'+cursor.value.field+'</td>';
-        table +=      '<td align="center">'+cursor.value.oldvalue+'</td>';
-        table +=      '<td align="center">'+cursor.value.newvalue+'</td>';
-        table +=      '<td align="center"><button onclick="removeModif('+cursor.key+');" class="btn btn-primary btn-width" type="button">Delete</td>';
-
-        table +=    '</tr>';
-        $('#tblsearchitems tbody').append(table);
-
-        //  });
-
-
+        $('#tblmodif tbody').append(
+        '<tr id="'+modifInfo.key+'" >'+
+        '<td align="center">'+modifInfo.tablename+'</td>'+
+        '<td align="center">'+modifInfo.field+'</td>'+
+        '<td align="center">'+modifInfo.newvalue+'</td>'+
+        '<td align="center">'+modifInfo.name+'</td>'+
+        '<td><a onclick="removeAdd('+modifInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
         cursor.continue();
 
       }
@@ -210,27 +199,21 @@ function endSync(){
         id = cursor.value.id;
         field = cursor.value.field;
         value = cursor.value.newvalue;
+        console.log(tablename);
 
-        switch(tablename) {
-          case "sites":
+        if(tablename == "sites") {
           tableid = "siteid";
-          break;
-          case "items":
-          tableid = "siteid";
-          break;
-          case "locations":
+        } else if(tablename == "items") {
+          tableid = "itemid";
+        } else if(tablename == "locations") {
           tableid = "locid";
-          break;
-          case "companies":
-          tableid = "cieid";
-          break;
-
-          default:
-          tableid = "error";
-
+        } else if(tablename == "itemserial") {
+          tableid = "itemserialid"
+        } else if(tablename == "itemsite") {
+          tableid = "itemsiteid"
         }
 
-        console.log("Update " + tablename + " set " + field + " = '" + value + "' where " + tableid + " = " + id);
+        //console.log("Update " + tablename + " set " + field + " = '" + value + "' where " + tableid + " = " + id);
 
         $.ajax({
 
@@ -242,7 +225,7 @@ function endSync(){
 
           success: function (data) {
             if (data.state == 1 && alertMsg == true){
-              var x = document.getElementById("tblsearchitems").getElementsByTagName("tr");
+              var x = document.getElementById("tblmodif").getElementsByTagName("tr");
               x[tdid].style.backgroundColor = "#00cc00";
               tdid += 1;
 
@@ -291,23 +274,19 @@ function endSyncAjouts(){
         //CHECKER POUR QUE SA FASSE PAS LOCATIONS 2 FOIS
         getAddTableFields(tablename,addid).then(function(object){
           console.log(object.string + " " + object.tablename)
-          switch(object.tablename) {
-            case "sites":
+
+          if(object.tablename == "sites") {
             fields = "(cieid,name,sitecode)";
-            break;
-            case "items":
+          } else if(object.tablename == "items") {
             fields = "(cieid,descr,isActive,isserialno,isserialnoqty,itemcode,locid,siteid,uomid)";
-            break;
-            case "locations":
+          } else if(object.tablename == "locations") {
             fields = "(cieid,Name,isdefault,locCode,siteid)";
-            break;
-            case "itemserial":
+          } else if(object.tablename == "itemserial") {
             fields = "(cieid,itemid,isActive,locid,qtyonhand,serialno,siteid)";
-            break;
-            default:
-            tableid = "error";
+          } else if(object.tablename == "itemsite") {
+            fields = "(cieid,itemsiteid,itemid,locid,siteid,qtyonhand,rankno)";
           }
-          //  console.log(values + " " + currentTableName + " " + fields);
+            console.log(values + " " + currentTableName + " " + fields);
 
             $.ajax({
               //alert('ajax');
@@ -357,6 +336,7 @@ function getAddTableFields(tablename,addid)
           for(var fieldNameIndex in tableStructure[tablename]){
             var fieldName = tableStructure[tablename][fieldNameIndex];
             //console.log(fieldName);
+            console.log(fieldName);
             arrayValue.push("'"+getData.result[fieldName]+"'")
           }
           var string = arrayValue.join(",");
