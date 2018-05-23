@@ -23,6 +23,8 @@ function getItemserial($conn) {
         echo " { ";
         echo "\"cieid\": " . $row['cieid'] . ", ";
         echo "\"serialno\": \"" . $row['serialno'] . "\" , ";
+        echo "\"idprextra\": " . $row['itemserialid'] . ", ";
+
         echo "\"siteid\": " . $row['siteid'] . ", ";
         echo "\"itemid\": " . $row['itemid'] . ", ";
         echo "\"locid\": " . $row['locid'] . ", ";

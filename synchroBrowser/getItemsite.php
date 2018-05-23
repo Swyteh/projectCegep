@@ -22,6 +22,8 @@ function getItemsite($conn) {
         $i +=1;
         echo " { ";
         echo "\"itemid\": " . $row['itemid'] . ", ";
+        echo "\"idprextra\": " . $row['itemsiteid'] . ", ";
+
         echo "\"siteid\": " . $row['siteid'] . ", ";
         echo "\"cieid\": " . $row['cieid'] . ", ";
         echo "\"locid\": " . $row['locid'] . ", ";

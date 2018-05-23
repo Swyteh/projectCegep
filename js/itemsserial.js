@@ -123,8 +123,8 @@ function readAllItems() {
       $('#tblsearchitems tfoot').append(
         '<tr><td coslpan="4" align="right">'+
         (nbitem + 1)+' à '+(nbitem + 50)+' de '+count+' '+
-        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Précédent </button>'+
-        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Suivant </button>'+
+        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Previous </button>'+
+        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Next </button>'+
         '</td></tr>');
       if((nbitem + 50) >= count){
         document.getElementById("nextb").disabled = true;
@@ -371,13 +371,14 @@ function updateItem() {
       data.siteid = site;
       data.locid = location;
       data.qtyonhand = qte;
+      var idprextra = data.idprextra;
       var updatedItem = db.put(data);
       alert(data.serialno + " has been updated to your database.");
 
-      addModif("siteid",itemserial,String(site),"itemserial", name).then(function(modif){
-        addModif("locid",itemserial,String(location),"itemserial", name).then(function(modif){
-          addModif("qtyonhand",itemserial,String(qte),"itemserial", name).then(function(modif){
-            addModif("isactive",itemserial,String(actif),"itemserial", name).then(function(modif){
+      addModif("siteid",idprextra,String(site),"itemserial", name).then(function(modif){
+        addModif("locid",idprextra,String(location),"itemserial", name).then(function(modif){
+          addModif("qtyonhand",idprextra,String(qte),"itemserial", name).then(function(modif){
+            addModif("isactive",idprextra,String(actif),"itemserial", name).then(function(modif){
               openSearchItemSerial(false);
             });
           });
@@ -399,13 +400,20 @@ function remove() {
     var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
+
+      var db1 = event.target.result.transaction(["itemserial"], "readwrite")
+      .objectStore("itemserial")
+      .get(item);
+      db1.onsuccess = function(event) {
+        idprextra = db1.result.idprextra;
+      };
+
       var db = event.target.result.transaction(["itemserial"], "readwrite")
       .objectStore("itemserial")
       .delete(item);
       db.onsuccess = function(event) {
-        alert(db.result.serialno);
         alert("Serial number deleted");
-        addDel(item,"itemserial",name).then(function(modif){
+        addDel(idprextra,"itemserial",name).then(function(modif){
           openSearchItemSerial(false);
         });
       };
@@ -429,7 +437,7 @@ function readInfoItem() {
       });
       $('#addLine').append(
         '<tr><td colspan="6" align="center">'+
-        '<button onclick="addItem()" class="btn btn-primary" type="button">Ajouter item</button></td></tr>');
+        '<button onclick="addItem()" class="btn btn-primary" type="button">Add item</button></td></tr>');
     } else {
       var db = event.target.result
       .transaction("itemserial", "readwrite")
@@ -465,8 +473,8 @@ function readInfoItem() {
           $('#fqte').val(itemInfo.qte);
           $('#addLine').append(
             '<tr><td colspan="6" align="center">'+
-            '<button onclick="updateItem();" class="btn btn-primary" type="button">Modifier item</button>'+
-            ' &nbsp<button onclick="remove();" class="btn btn-primary" type="button">Supprimer</button>'+
+            '<button onclick="updateItem();" class="btn btn-primary" type="button">Update item</button>'+
+            ' &nbsp<button onclick="remove();" class="btn btn-primary" type="button">Delete</button>'+
             '</td></tr>');
           loadSite(itemInfo.siteid);
           $('#fsite').on('change', function() {

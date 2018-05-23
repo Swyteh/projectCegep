@@ -120,8 +120,8 @@ function readAllItems() {
       $('#tblsearchitems tfoot').append(
         '<tr><td coslpan="4" align="right">'+
         (nbitem + 1)+' à '+(nbitem + 50)+' de '+count+' '+
-        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Précédent </button>'+
-        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Suivant </button>'+
+        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Previous </button>'+
+        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Next </button>'+
         '</td></tr>');
       if((nbitem + 50) >= count){
         document.getElementById("nextb").disabled = true;
@@ -326,12 +326,13 @@ function updateItem() {
       data.descr = descr;
       data.isActive = actif;
       data.uomid = uom;
+      var idprextra = data.idprextra;
       var updatedItem = db.put(data);
-      alert(code + " has been updated to your database.");
-      addModif("itemcode",item,String(code),"items", name).then(function(modif){
-        addModif("descr",item,String(descr),"items", name).then(function(modif){
-          addModif("uom",item,String(uom),"items", name).then(function(modif){
-            addModif("isactive",item,String(actif),"items", name).then(function(modif){
+      alert(code + " has been updated to your database." );
+      addModif("itemcode",idprextra,String(code),"items", name).then(function(modif){
+        addModif("descr",idprextra,String(descr),"items", name).then(function(modif){
+          addModif("uomid",idprextra,String(uom),"items", name).then(function(modif){
+            addModif("isactive",idprextra,String(actif),"items", name).then(function(modif){
               openSearchItem();
             });
           });
@@ -376,6 +377,7 @@ function updateloc(){
 //delete un item
 function remove() {
   if (confirm("Are you sure you want to delete this item?")){
+    var idprextra;
     var cookieValue = $.cookie("itemid");
     var item = parseInt(cookieValue);
     cookieValue = $.cookie("name");
@@ -384,21 +386,33 @@ function remove() {
     request.onsuccess = function(event) {
 
       itemsiteids.forEach(function(id){
+        var db1 = event.target.result.transaction(["itemsite"], "readwrite")
+        .objectStore("itemsite")
+        .get(id);
+        db1.onsuccess = function(event) {
+          idprextra = db1.result.idprextra;
+        };
         var db = event.target.result.transaction(["itemsite"], "readwrite")
         .objectStore("itemsite")
         .delete(id);
         db.onsuccess = function(event) {
-          addDel(id,"itemsite",name).then(function(modif){
+          addDel(idprextra,"itemsite",name).then(function(modif){
             alert("itemsiteid deleted");
           });
         };
       });
+      var db1 = event.target.result.transaction(["items"], "readwrite")
+      .objectStore("items")
+      .get(item);
+      db1.onsuccess = function(event) {
+        idprextra = db1.result.idprextra;
+      };
 
       var db = event.target.result.transaction(["items"], "readwrite")
       .objectStore("items")
       .delete(item);
       db.onsuccess = function(event) {
-        addDel(item,"items", name).then(function(modif){
+        addDel(idprextra,"items", name).then(function(modif){
           getSerial(item);
         });
       };
@@ -415,7 +429,7 @@ function getSerial(itemid){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.itemid == itemid){
-          removeSerial(cursor.key, cursor.value.serialno);
+          removeSerial(cursor.key, cursor.value.idprextra, cursor.value.serialno);
         }
         cursor.continue();
       } else {
@@ -425,14 +439,14 @@ function getSerial(itemid){
   };
 }
 
-function removeSerial(id, serial){
+function removeSerial(id, idprextra, serial){
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var db = event.target.result.transaction(["itemserial"], "readwrite")
     .objectStore("itemserial")
     .delete(id);
     db.onsuccess = function(event) {
-      addDel(id,"itemserial", serial).then(function(modif){
+      addDel(idprextra,"itemserial", serial).then(function(modif){
         console.log("itemserial"+id+" deleted");
       });
     };
@@ -447,7 +461,7 @@ function readInfoItem() {
     if(item == 0) {
       loadAdd(0);
       $('#addLine').append('<tr><td colspan="4" align="center">'+
-      '<button onclick="addItem()" class="btn btn-primary" type="button">Ajouter item</button></td></tr>');
+      '<button onclick="addItem()" class="btn btn-primary" type="button">Add item</button></td></tr>');
     } else {
       var db = event.target.result
       .transaction("items", "readwrite")
@@ -467,8 +481,8 @@ function readInfoItem() {
         loadAdd(getItem.result.uomid);
         $('#addLine').append(
           '<tr><td colspan="4" align="center">'+
-          '<button onclick="updateloc();" class="btn btn-primary" type="button">Modifier item</button>'+
-          ' &nbsp<button onclick="remove();" class="btn btn-primary" type="button">Supprimer</button>'+
+          '<button onclick="updateloc();" class="btn btn-primary" type="button">Update item</button>'+
+          ' &nbsp<button onclick="remove();" class="btn btn-primary" type="button">Delete</button>'+
           '</td></tr>');
         document.getElementById("tblinfoitemsite").style.display = "";
         loadLocLine();
@@ -506,7 +520,7 @@ function loadLocLine() {
                 '<td align="center">'+sitename+'</td>'+
                 '<td align="center">'+locname+'</td>'+
                 '<td align="center"><input type="number" id="loc'+itemInfo.itemsiteid+'" value="'+itemInfo.qte+'" min="0"></td>'+
-                '<td align="center"><button onclick="deleteLoc('+itemInfo.itemsiteid+')" class="btn btn-primary" type="button">Supprimer</button></tr>');
+                '<td align="center"><button onclick="deleteLoc('+itemInfo.itemsiteid+')" class="btn btn-primary" type="button">Delete</button></tr>');
               cptitemsite = cptitemsite + 1;
               itemsiteids.push(itemInfo.itemsiteid);
             });

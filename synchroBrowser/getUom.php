@@ -22,6 +22,7 @@ function getUom($conn) {
         $i +=1;
         echo " { ";
         echo "\"uomcode\": \"" . $row['uomcode'] . "\" , ";
+        echo "\"idprextra\": " . $row['uomid'] . ", ";
         echo "\"name\": \"" . $row['name'] . "\" , ";
         echo "\"cieid\": " . $row['cieid'] . " ";
         if ($i != $rowCount){

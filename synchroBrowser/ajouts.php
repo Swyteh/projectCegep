@@ -18,7 +18,7 @@ function ajoutQuery($conn){
   {
     $sth  = $conn->prepare($sql);
     $sth->execute();
-    echo json_encode(array("state"=>1));
+    echo json_encode(array("state"=>1,"query"=>$sql));
   }
   catch(Exception $e)
   {

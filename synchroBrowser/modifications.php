@@ -29,7 +29,7 @@ function updateQuery($conn){
   catch(Exception $e)
   {
   //  die( print_r( $e->getMessage() ) );
-    echo json_encode(array("state"=>0));
+    echo json_encode(array("state"=>$e->getMessage(),"query"=>$sql));
 
   }
 

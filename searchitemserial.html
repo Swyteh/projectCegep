@@ -43,34 +43,34 @@
       </nav>
       <div class="container-fluid" >
         <div class="row" >
-          <h1 class="page-header">Recherche #Série</h1>
+          <h1 class="page-header">Search Serial Number</h1>
           <div class="table-responsive container">
             <div class="row">
               <div class="panel panel-default">
                 <h4>
-                  # Série
+                  Serial number
                 </h4>
                 <table class="table table-striped tblsearch">
                   <tr>
                     <td><input type="text" id="fitem"></td>
                     <td colspan="2" align="left">
-                      <button onclick="readItem()" id="buttonsearch" class="btn btn-primary btn-width" type="button">Recherche # série</button>
-                      <button onclick="checkItemCode()" id="buttonsearchbyitem" class="btn btn-primary btn-width" type="button">Recherche item</button>
-                      <button onclick="readAllItems()" id="buttonsearchall" class="btn btn-primary btn-width" type="button">Tous les items </button>
-                      <button onclick="openItemSerial(0)" id="buttonadd" class="btn btn-primary btn-width" type="button">Ajout item </button>
+                      <button onclick="readItem()" id="buttonsearch" class="btn btn-primary btn-width" type="button">Search serial number</button>
+                      <button onclick="checkItemCode()" id="buttonsearchbyitem" class="btn btn-primary btn-width" type="button">Search item</button>
+                      <button onclick="readAllItems()" id="buttonsearchall" class="btn btn-primary btn-width" type="button">All items </button>
+                      <button onclick="openItemSerial(0)" id="buttonadd" class="btn btn-primary btn-width" type="button">Add item </button>
                     </td>
-                    <td align="center"><input type="checkbox" id="factifslm" checked > Actif seulement</td>
+                    <td align="center"><input type="checkbox" id="factifslm" checked > Active only</td>
                   </tr>
                 </table>
 
                 <table class="table table-striped table-fixed" id="tblsearchitems" >
                   <thead>
                     <tr>
-                      <th class="col-xs-2" style="text-align:center;"># Série</th>
-                      <th class="col-xs-2" style="text-align:center;"># Série</th>
+                      <th class="col-xs-2" style="text-align:center;">Serial number</th>
+                      <th class="col-xs-2" style="text-align:center;">Code</th>
                       <th class="col-xs-5" >Description</th>
-                      <th class="col-xs-2" style="text-align:center;">Quantitée</th>
-                      <th class="col-xs-1" style="text-align:center;">Actif</th>
+                      <th class="col-xs-2" style="text-align:center;">Quantity</th>
+                      <th class="col-xs-1" style="text-align:center;">Active</th>
                     </tr>
                   </thead>
                   <tbody id="tblsearchitemsbody">

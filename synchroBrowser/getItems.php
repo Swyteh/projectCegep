@@ -24,6 +24,7 @@ function getItems($conn) {
         echo "\"itemcode\": \"" . $row['itemcode'] . "\" , ";
         echo "\"descr\": \"" . $row['descr'] . "\" , ";
         echo "\"cieid\": " . $row['cieid'] . ", ";
+        echo "\"idprextra\": " . $row['itemid'] . ", ";
         echo "\"uomid\": " . $row['uomid'] . ", ";
         echo "\"siteid\": " . $row['siteid'] . ", ";
         echo "\"locid\": " . $row['locid'] . ", ";

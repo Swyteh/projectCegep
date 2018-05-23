@@ -137,103 +137,10 @@ function checkExists(){
       document.getElementById("buttonsearchall").disabled = true;
       document.getElementById("buttonadd").disabled = true;
       document.getElementById("buttonsearchbyitem").disabled = true;
-      alert("Vous devez d'abords synchroniser votre base de donnée.");
+      alert("No database found.");
+
     }
   };
-}
-
-function checkNewAndDel(){
-    request = window.indexedDB.open("prextraDB",2);
-    request.onsuccess = function(event) {
-      var db = event.target.result
-      .transaction("deldata", "readwrite")
-      .objectStore("deldata");
-      db.openCursor().onsuccess = function(event) {
-        var cursor = event.target.result;
-        if (cursor) {
-          delNewData(cursor.value.delid, cursor.value.tablename, cursor.key).then(function(modif){
-            modif.forEach(function(id){
-              var db = event.target.result
-              .transaction("deldata", "readwrite")
-              .objectStore("deldata")
-              .delete(id);
-              db.onsuccess = function(event) {
-                console.log("delete from newdata");
-              };
-            }
-          });
-          cursor.continue();
-        }
-      };
-    };
-    request.onerror = function(event){
-      reject(request.error);
-    };
-}
-
-function delNewData(id, tablename, iddel){
-  return new Promise(function(resolve,reject){
-    request = window.indexedDB.open("prextraDB",2);
-    request.onsuccess = function(event) {
-      var idtodel = [];
-      var db = event.target.result
-      .transaction("newdata", "readwrite")
-      .objectStore("newdata")
-      db.openCursor().onsuccess = function(event) {
-        var cursor = event.target.result;
-        if (cursor) {
-          if (cursor.value.addid == id && cursor.value.tablename == tablename) {
-            idtodel.push(cursor.key);
-          }
-          cursor.continue();
-        } else {
-          resolve(idtodel);
-        }
-      };
-    };
-    request.onerror = function(event){
-      reject(request.error);
-    };
-  });
-}
-
-function delModifData(id, tablename, iddel){
-  return new Promise(function(resolve,reject){
-    request = window.indexedDB.open("prextraDB",2);
-    request.onsuccess = function(event) {
-      var db = event.target.result
-      .transaction("modifications", "readwrite")
-      .objectStore("modifications")
-      db.openCursor().onsuccess = function(event) {
-        var cursor = event.target.result;
-        if (cursor) {
-          if (cursor.value.id == id && cursor.value.tablename == tablename) {
-            var db2 = event.target.result
-            .transaction("newdata", "readwrite")
-            .objectStore("newdata")
-            .delete(cursor.key);
-            db2.onsuccess = function(event){
-              console.log("deletedel");
-            };
-
-            var db3 = event.target.result
-            .transaction("deldata", "readwrite")
-            .objectStore("deldata")
-            .delete(iddel);
-            db2.onsuccess = function(event){
-              console.log("deletenew");
-            };
-          }
-          cursor.continue();
-        } else {
-          resolve("allo");
-        }
-      };
-    };
-    request.onerror = function(event){
-      reject(request.error);
-    };
-  });
 }
 
 function getqte(object){

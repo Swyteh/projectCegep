@@ -22,6 +22,7 @@ function getLocations($conn) {
         $i +=1;
         echo " { ";
         echo "\"locCode\": \"" . $row['locCode'] . "\" , ";
+        echo "\"idprextra\": " . $row['locid'] . ", ";
         echo "\"Name\": \"" . $row['Name'] . "\" , ";
         echo "\"cieid\": " . $row['cieid'] . ", ";
         echo "\"siteid\": " . $row['siteid'] . ", ";

@@ -21,7 +21,6 @@ var tableStructure = {
 
 
 function showAdd() {
-  console.log();
   var table;
   var request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
@@ -81,7 +80,7 @@ function showDel() {
         '<tr id="'+newdataInfo.key+'" >'+
         '<td align="center">'+newdataInfo.tablename+'</td>'+
         '<td align="center">'+newdataInfo.name+'</td>'+
-        '<td><a onclick="removeAdd('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
+        '<td><a onclick="removeDel('+newdataInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
         cursor.continue();
       }
     };
@@ -98,7 +97,7 @@ function showModifs() {
   var table;
   var request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
-    $('#tblsearchitems tbody').empty();
+    $('#tblmodif tbody').empty();
     var db = request.result
     .transaction("modifications", "readwrite")
     .objectStore("modifications")
@@ -121,7 +120,7 @@ function showModifs() {
         '<td align="center">'+modifInfo.field+'</td>'+
         '<td align="center">'+modifInfo.newvalue+'</td>'+
         '<td align="center">'+modifInfo.name+'</td>'+
-        '<td><a onclick="removeAdd('+modifInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
+        '<td><a onclick="removeModif('+modifInfo.key+');"  class="btn btn-primary btn-width" type="button">Delete</a></td></tr>');
         cursor.continue();
 
       }
@@ -131,7 +130,6 @@ function showModifs() {
       alert("error noob");
       console.log(event);
     };
-
   }
   showAdd();
   showDel();
@@ -199,7 +197,6 @@ function endSync(){
         id = cursor.value.id;
         field = cursor.value.field;
         value = cursor.value.newvalue;
-        console.log(tablename);
 
         if(tablename == "sites") {
           tableid = "siteid";
@@ -212,8 +209,11 @@ function endSync(){
         } else if(tablename == "itemsite") {
           tableid = "itemsiteid"
         }
+        if (field == "isactive" && tablename == "items"){
+          field = "isActive";
+        }
 
-        //console.log("Update " + tablename + " set " + field + " = '" + value + "' where " + tableid + " = " + id);
+        console.log("Update " + tablename + " set " + field + " = '" + value + "' where " + tableid + " = " + id);
 
         $.ajax({
 
@@ -229,9 +229,8 @@ function endSync(){
               x[tdid].style.backgroundColor = "#00cc00";
               tdid += 1;
 
-            }
-            if (data.state == 0){
-              alert("Erreur");
+            } else {
+              alert(data.query);
             }
           }
         });
@@ -249,10 +248,10 @@ function endSync(){
     };
 
   };
+  clearData();
+
 }
 function endSyncAjouts(){
-  var tables=[];
-  var addids=[];
   var tablename;
   var tdid = 1;
   var addid;
@@ -265,16 +264,12 @@ function endSyncAjouts(){
     db.openCursor().onsuccess = function(event) {
       var cursor = event.target.result;
       if (cursor){
-        //  console.log(siteInfo);
-        tables.push(cursor.value.tablename);
-        addids.push(cursor.value.addid);
         tablename = cursor.value.tablename;
         console.log(tablename);
+
         addid = cursor.value.addid;
         //CHECKER POUR QUE SA FASSE PAS LOCATIONS 2 FOIS
         getAddTableFields(tablename,addid).then(function(object){
-          console.log(object.string + " " + object.tablename)
-
           if(object.tablename == "sites") {
             fields = "(cieid,name,sitecode)";
           } else if(object.tablename == "items") {
@@ -286,7 +281,7 @@ function endSyncAjouts(){
           } else if(object.tablename == "itemsite") {
             fields = "(cieid,itemsiteid,itemid,locid,siteid,qtyonhand,rankno)";
           }
-            console.log(values + " " + currentTableName + " " + fields);
+            console.log(object.string + " " + object.tablename + " " + fields);
 
             $.ajax({
               //alert('ajax');
@@ -296,15 +291,13 @@ function endSyncAjouts(){
               data: {tablename:object.tablename, fields:fields, values:object.string},
               success: function (data) {
                 if (data.state == 1) {
-                  //alert("OKAYYYYY");
+                  // alert("OKAYYYYY");
                   var x = document.getElementById("tblajout").getElementsByTagName("tr");
                   x[tdid].style.backgroundColor = "#00cc00";
                   tdid += 1;
-
                 }
                 else{
-                  console.log(data.state);
-                  console.log(data.query);
+                  alert(data.query);
                 }
               }
             });
@@ -336,7 +329,6 @@ function getAddTableFields(tablename,addid)
           for(var fieldNameIndex in tableStructure[tablename]){
             var fieldName = tableStructure[tablename][fieldNameIndex];
             //console.log(fieldName);
-            console.log(fieldName);
             arrayValue.push("'"+getData.result[fieldName]+"'")
           }
           var string = arrayValue.join(",");
@@ -367,7 +359,6 @@ function endSyncDel(){
       if (cursor){
         //  console.log(siteInfo);
         tablename = cursor.value.tablename;
-        console.log(tablename);
         delid = cursor.value.delid;
         switch(tablename) {
           case "sites":
@@ -399,8 +390,6 @@ function endSyncDel(){
 
             }
             else{
-              var x = document.getElementById("tbldelete").getElementsByTagName("tr");
-              x[tdid].style.backgroundColor = "#f44242";
               tdid += 1;
               console.log(data.state);
               console.log(data.query);
@@ -417,4 +406,25 @@ function endSyncDel(){
     };
   };
 
+}
+function clearData() {
+var request = window.indexedDB.open("prextraDB",2);
+request.onsuccess = function(event) {
+    var db = request.result
+
+    var transaction = db.transaction(["newdata"], "readwrite");
+    var objectStore = transaction.objectStore("newdata");
+    var objectStoreRequest = objectStore.clear();
+    objectStoreRequest.onsuccess = function(event) {};
+
+    transaction = db.transaction(["modifications"], "readwrite");
+    objectStore = transaction.objectStore("modifications");
+      objectStoreRequest = objectStore.clear();
+        objectStoreRequest.onsuccess = function(event) {};
+
+    transaction = db.transaction(["deldata"], "readwrite");
+    objectStore = transaction.objectStore("deldata");
+      objectStoreRequest = objectStore.clear();
+        objectStoreRequest.onsuccess = function(event) {};
+  };
 }

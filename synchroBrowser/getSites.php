@@ -23,6 +23,7 @@ function getSites($conn) {
         echo " { ";
         echo "\"sitecode\": \"" . $row['sitecode'] . "\" , ";
         echo "\"name\": \"" . $row['name'] . "\" , ";
+        echo "\"idprextra\": " . $row['siteid'] . ", ";
         echo "\"cieid\": " . $row['cieid'] . ", ";
         echo "\"siteid\": " . $row['siteid'] . " ";
         if ($i != $rowCount){

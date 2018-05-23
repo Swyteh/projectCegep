@@ -22,6 +22,7 @@ function getCompanies($conn) {
         $i +=1;
         echo " { ";
         echo "\"cieCode\": \"" . $row['cieCode'] . "\" , ";
+        echo "\"idprextra\": " . $row['cieid'] . ", ";
         echo "\"name\": \"" . $row['name'] . "\" , ";
         echo "\"followupinvloc\": " . $row['followupinvloc'] . " ";
         if ($i != $rowCount){

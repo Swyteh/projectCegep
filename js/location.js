@@ -71,8 +71,8 @@ function readAllLocs() {
       $('#tblsearchlocs tfoot').append(
         '<tr><td coslpan="4" align="right">'+
         (nbloc + 1)+' à '+(nbloc + 50)+' de '+count+' '+
-        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Précédent </button>'+
-        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Suivant </button>'+
+        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Previous </button>'+
+        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Next </button>'+
         '</td></tr>');
       if((nbloc + 50) >= count){
         document.getElementById("nextb").disabled = true;
@@ -183,11 +183,12 @@ function updateLoc() {
       data.locCode = code;
       data.Name = name;
       data.siteid = site;
+      var idprextra = data.idprextra;
       var updatedLoc = db.put(data);
       alert(code + " has been updated to your database.");
-      addModif("locCode",loc,String(code),"locations", name).then(function(modif){
-        addModif("Name",loc,String(name),"locations", name).then(function(modif){
-          addModif("siteid",loc,String(site),"locations", name).then(function(modif){
+      addModif("locCode",idprextra,String(code),"locations", name).then(function(modif){
+        addModif("Name",idprextra,String(name),"locations", name).then(function(modif){
+          addModif("siteid",idprextra,String(site),"locations", name).then(function(modif){
             openSearchLoc();
           });
         });
@@ -213,7 +214,7 @@ function checkItem(){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.locid == loc){
-          alert("This location is use");
+          alert("This location is used elsewhere");
           return;
         }
         cursor.continue();
@@ -235,7 +236,7 @@ function checkItemSerial(){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.locid == loc){
-          alert("This location is use");
+          alert("This location is used elsewhere");
           return;
         }
         cursor.continue();
@@ -254,13 +255,21 @@ function remove() {
     var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
+
+      var db1 = event.target.result.transaction(["locations"], "readwrite")
+      .objectStore("locations")
+      .get(loc);
+      db1.onsuccess = function(event) {
+        idprextra = db1.result.idprextra;
+      };
+
       var db = event.target.result.transaction(["locations"], "readwrite")
       .objectStore("locations")
       .delete(loc);
 
       db.onsuccess = function(event) {
         alert("Location deleted");
-        addDel(loc,"locations",name).then(function(modif){
+        addDel(idprextra,"locations",name).then(function(modif){
           openSearchLoc();
         });
       };
@@ -278,21 +287,21 @@ function readInfoLoc() {
       loadSites(0);
       $('#tblinfoloc tbody').append(
         '<tr><td colspan="6" align="center">'+
-        '<button onclick="addLoc()" class="btn btn-primary" type="button">Ajouter item</button></td></tr>');
+        '<button onclick="addLoc()" class="btn btn-primary" type="button">Add item</button></td></tr>');
     } else {
       var db = event.target.result
       .transaction("locations", "readwrite")
       .objectStore("locations");
       var getLoc = db.get(loc);
       getLoc.onsuccess = function() {
-        $.cookie("name", getSite.result.Name);
+        $.cookie("name", getLoc.result.Name);
         $('#floccode').val(''+getLoc.result.locCode+'');
         $('#flocname').val(''+getLoc.result.Name+'');
         loadSites(getLoc.result.siteid);
         $('#tblinfoloc tbody').append(
           '<tr><td colspan="6" align="center">'+
-          '<button onclick="updateLoc()" class="btn btn-primary" type="button">Modifier item</button>'+
-          ' &nbsp<button onclick="checkItem()" class="btn btn-primary" type="button">Supprimer</button>'+
+          '<button onclick="updateLoc()" class="btn btn-primary" type="button">Update location</button>'+
+          ' &nbsp<button onclick="checkItem()" class="btn btn-primary" type="button">Delete</button>'+
           '</td></tr>');
       };
     }

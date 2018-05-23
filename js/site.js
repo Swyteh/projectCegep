@@ -68,8 +68,8 @@ function readAllSites() {
       $('#tblsearchsites tfoot').append(
         '<tr><td coslpan="4" align="right">'+
         (nbsite + 1)+' à '+(nbsite + 50)+' de '+count+' '+
-        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Précédent </button>'+
-        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Suivant </button>'+
+        '<button onclick="previous()" width="100px" class="btn btn-primary btn-width" id="previousb" type="button">Previous </button>'+
+        '&nbsp<button onclick="next()" width="200px" class="btn btn-primary btn-width" id="nextb" type="button">Next </button>'+
         '</td></tr>');
       if((nbsite + 50) >= count){
         document.getElementById("nextb").disabled = true;
@@ -178,11 +178,12 @@ function updateSite() {
       data.sitecode = code;
       data.name = name;
       data.cieid = cie;
+      var idprextra = data.idprextra;
       var updatedSite = db.put(data);
       alert(code + " has been updated to your database.");
-      addModif("sitecode",site,String(code),"sites", name).then(function(modif){
-        addModif("name",site,String(name),"sites", name).then(function(modif){
-          addModif("cieid",site,String(cie),"sites", name).then(function(modif){
+      addModif("sitecode",idprextra,String(code),"sites", name).then(function(modif){
+        addModif("name",idprextra,String(name),"sites", name).then(function(modif){
+          addModif("cieid",idprextra,String(cie),"sites", name).then(function(modif){
             openSearchSite();
           });
         });
@@ -246,13 +247,21 @@ function remove(){
     var name = cookieValue;
     request = window.indexedDB.open("prextraDB",2);
     request.onsuccess = function(event) {
+
+      var db1 = event.target.result.transaction(["sites"], "readwrite")
+      .objectStore("sites")
+      .get(site);
+      db1.onsuccess = function(event) {
+        idprextra = db1.result.idprextra;
+      };
+
       var db = event.target.result.transaction(["sites"], "readwrite")
       .objectStore("sites")
       .delete(site);
 
       db.onsuccess = function(event) {
         alert("Site deleted");
-        addDel(site,"sites",name).then(function(modif){
+        addDel(idprextra,"sites",name).then(function(modif){
           getLocation(site);
         });
       };
@@ -269,7 +278,7 @@ function getLocation(site){
       var cursor = event.target.result;
       if (cursor){
         if (cursor.value.siteid == site){
-          removeLoc(cursor.key, cursor.value.Name);
+          removeLoc(cursor.key, cursor.value.idprextra, cursor.value.Name);
         }
         cursor.continue();
       } else {
@@ -279,14 +288,14 @@ function getLocation(site){
   };
 }
 
-function removeLoc(id, name){
+function removeLoc(id, idprextra, name){
   request = window.indexedDB.open("prextraDB",2);
   request.onsuccess = function(event) {
     var db = event.target.result.transaction(["locations"], "readwrite")
     .objectStore("locations")
     .delete(id);
     db.onsuccess = function(event) {
-      addDel(id,"locations",name).then(function(modif){
+      addDel(idprextra,"locations",name).then(function(modif){
         console.log("location "+id+" deleted");
       });
     };
@@ -302,7 +311,7 @@ function readInfoSite() {
       loadCie(0);
       $('#tblinfosite tbody').append(
         '<tr><td colspan="6" align="center">'+
-        '<button onclick="addSite()" class="btn btn-primary" type="button">Ajouter site</button></td>'+'</tr>');
+        '<button onclick="addSite()" class="btn btn-primary" type="button">Add site</button></td>'+'</tr>');
     } else {
       var db = event.target.result
       .transaction("sites", "readwrite")
@@ -315,8 +324,8 @@ function readInfoSite() {
         loadCie(getSite.result.siteid);
         $('#tblinfosite tbody').append(
           '<tr><td colspan="6" align="center">'+
-          '<button onclick="updateSite()" class="btn btn-primary" type="button">Modifier item</button>'+
-          ' &nbsp<button onclick="checkItem()" class="btn btn-primary" type="button">Supprimer</button>'+
+          '<button onclick="updateSite()" class="btn btn-primary" type="button">Update site</button>'+
+          ' &nbsp<button onclick="checkItem()" class="btn btn-primary" type="button">Delete</button>'+
           '</td></tr>');
       };
     }

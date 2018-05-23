@@ -17,7 +17,7 @@ function deleteQuery($conn){
   try
   {
     $sth  = $conn->prepare($sql);
-//    $sth->execute();
+    $sth->execute();
     echo json_encode(array("state"=>1,"query"=>$sql));
   }
   catch(Exception $e)
